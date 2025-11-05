@@ -8,7 +8,6 @@ const Footer = () => {
     return (
         <footer className="mt-16 bg-[rgb(0,0,30)] text-amber-500 py-12 px-6">
             <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
-            {/* About Us Section */}
             <div className="space-y-3">
                 <h3 className="font-bold text-xl mb-3">About Us</h3>
                 <p 
