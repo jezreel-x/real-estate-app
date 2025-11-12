@@ -43,7 +43,7 @@ const Login = () => {
         } 
 
         // Perform login logic here
-        notify("success", "Login successful!");
+        notify("info", "Redirecting to OTP page...");
 
         const { role, name, phone } = user;
 
@@ -59,7 +59,7 @@ const Login = () => {
 
         // Role-based navigation
         const roleRoutes = {
-            customer: "/",
+            customer: "/otp-page",
             agent: "/agent",
             serviceprovider: "/serviceprovider",
             admin: "/admin",
@@ -73,7 +73,7 @@ const Login = () => {
             } else {
                 notify("error", "User role is not recognized.");
             }
-        }, 1000);
+        }, 2000);
     }
 
     return (

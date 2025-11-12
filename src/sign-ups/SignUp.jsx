@@ -141,7 +141,7 @@ const SignUp = () => {
                             { value: 'tenant', label: 'Tenant' },
                             { value: 'agent', label: 'Agent' },
                             { value: 'serviceprovider', label: 'Service Provider' },
-                            { value: 'admin', label: 'Admin' },
+                            { value: 'propertymanager', label: 'Property Manager' },
                         ]}
                         value={selectedRole}
                         onChange={setSelectedRole}
