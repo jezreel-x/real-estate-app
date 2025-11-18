@@ -1,7 +1,7 @@
 // OTPInput.jsx
 import React, { useRef, useState } from "react";
 import logo from '../assets/black.png';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 /**
  * OTPInput
@@ -17,6 +17,8 @@ export default function OTPInput({ length, onComplete }) {
   // inputsRef.current[0] -> first input, etc.
   const inputsRef = useRef([]);
 
+  const { state } = useLocation();
+  const method = state?.method || "your method";
 
   const navigate = useNavigate();
 
@@ -63,7 +65,7 @@ export default function OTPInput({ length, onComplete }) {
         setTimeout(() => focusInput(Math.min(writeIdx, length - 1)), 0);
         // if all filled, call complete
         if (next.every((d) => d !== "")) {
-          onComplete(next.join(""));
+          onComplete();
         }
         return next;
       });
@@ -91,7 +93,7 @@ export default function OTPInput({ length, onComplete }) {
 
       // checks to see if all boxes are filled with digits
       if (code.length === length && /^\d+$/.test(code)) {
-        onComplete(code);
+        onComplete();
       }
     }, 0);
   };
@@ -150,7 +152,7 @@ export default function OTPInput({ length, onComplete }) {
 
       // if all filled, call onComplete
       if (next.every((d) => d !== "")) {
-        onComplete(next.join(""));
+        onComplete();
       }
       return next;
     });
@@ -166,7 +168,7 @@ export default function OTPInput({ length, onComplete }) {
       console.warn("Incomplete or invalid OTP:", code);
       return;
     }
-    onComplete(code);
+    onComplete();
   };
 
   // Render
@@ -184,7 +186,10 @@ export default function OTPInput({ length, onComplete }) {
         </label>
 
         <label className="my-8 block text-center text-xl font-semibold text-gray-700" aria-hidden>
-            Enter the 6-digit code sent to your email or phone
+            Enter the 6-digit code sent to your 
+            {
+              method === "Email" ? " email address" : " phone number"
+            }.
         </label>
 
         <div

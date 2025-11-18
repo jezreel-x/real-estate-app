@@ -43,7 +43,7 @@ const Login = () => {
         } 
 
         // Perform login logic here
-        notify("info", "Redirecting to OTP page...");
+        notify("info", "Redirecting to OTP Delivery Method Page...");
 
         const { role, name, phone } = user;
 
@@ -59,7 +59,7 @@ const Login = () => {
 
         // Role-based navigation
         const roleRoutes = {
-            customer: "/otp-page",
+            customer: "/otp-delivery-method",
             agent: "/agent",
             serviceprovider: "/serviceprovider",
             admin: "/admin",

@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { Route } from "react-router-dom";
 
 const Login = lazy(() => import("../../sign-ups/Login"));
+const OTPDeliveryMethod = lazy(() => import("../../sign-ups/OTPDeliveryMethod"));
 const OTPPage = lazy(() => import("../../sign-ups/OTPPage"));
 const LandingPage = lazy(() => import("../../landing-page/LandingPage"));
 const SignUp = lazy(() => import("../../sign-ups/SignUp"));
@@ -13,6 +14,7 @@ const ResetPassword = lazy(() => import("../../sign-ups/ResetPassword"));
 
 const signUpRoutes = [
     <Route path="/login" element={<Login />} key="login" />,
+    <Route path="/otp-delivery-method" element={<OTPDeliveryMethod />} key="otp-delivery-method" />,
     <Route path="/otp-page" element={<OTPPage />} key="otp-page" />,
     <Route path="/" element={<LandingPage />} key="landing-page" />,
     <Route path="/sign-up" element={<SignUp />} key="sign-up" />,

@@ -135,8 +135,8 @@ const HouseForSaleDetails = () => {
             </div>
 
             {/* Details Section */}
-            <div className="relative flex w-full px-6">
-                <section className="relative w-[70%]">
+            <div className="relative flex flex-col lg:flex-row w-full px-6">
+                <section className="relative w-full lg:w-[70%]">
                     {/* Custom Navigation Buttons */}
                     <div className={`absolute top-[250px] left-2 z-10 -translate-y-1/2 cursor-pointer swiper-button-prev-${house.id} bg-black/50 p-2 rounded-full text-white hover:bg-black/70`}>
                         <ChevronLeft size={20} />
@@ -204,7 +204,9 @@ const HouseForSaleDetails = () => {
                         <button className="bg-[rgb(0,0,30)] text-amber-500 px-4 py-2 rounded hover:bg-black transition hover:scale-105 hover:duration-700 hover:ease-in-out cursor-pointer">Contact Seller</button>
                     </div>
                 </section>
-                <section className="w-[30%] pl-6 border-l">
+
+                {/* Sidebar Section */}
+                <section className="w-full lg:w-[30%] lg:pl-6 border-l">
                     {/* Sidebar or additional details can go here */}
                     <div className="grid grid-cols-2 mb-3">
                         {categories.map((category, index) => (

@@ -3,9 +3,9 @@ import OTPInput from "./OTPInput";
 import { toast } from "react-toastify";
 
 function OTPPage() {
-  const handleComplete = (code) => {
+  const handleComplete = () => {
     // send to server / verify
-    toast.success("Entered OTP: " + code);
+    toast.success("Code verified successfully!");
   };
 
   return (
