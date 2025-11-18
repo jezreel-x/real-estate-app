@@ -17,6 +17,7 @@ import { IoPersonOutline, IoVideocamOutline } from "react-icons/io5";
 import Navbar from "../landing-page/Navbar";
 import { toast } from "react-toastify";
 import Footer from "../landing-page/Footer";
+import useBreakpoint from "../custom-components/useBreakpoint";
 
 const HouseForSaleDetails = () => {
 
@@ -36,6 +37,8 @@ const HouseForSaleDetails = () => {
     const [scheduleVisitPhone, setScheduleVisitPhone] = useState("");
 
     const categories = ["Request Info", "Schedule a Visit"];
+
+    const breakpoint = useBreakpoint();
 
     const requestInfoActions = [
         { 
@@ -134,9 +137,11 @@ const HouseForSaleDetails = () => {
                 </Link>
             </div>
 
+            <div className="text-gray-600 text-sm font-semibold px-6">Current breakpoint: {breakpoint}</div>
+
             {/* Details Section */}
-            <div className="relative flex flex-col lg:flex-row w-full px-6">
-                <section className="relative w-full lg:w-[70%]">
+            <div className="relative flex flex-col xl:flex-row w-full px-6">
+                <section className="relative w-full xl:w-[50%] 2xl:w-[60%] 3xl:w-[70%]">
                     {/* Custom Navigation Buttons */}
                     <div className={`absolute top-[250px] left-2 z-10 -translate-y-1/2 cursor-pointer swiper-button-prev-${house.id} bg-black/50 p-2 rounded-full text-white hover:bg-black/70`}>
                         <ChevronLeft size={20} />
@@ -206,13 +211,13 @@ const HouseForSaleDetails = () => {
                 </section>
 
                 {/* Sidebar Section */}
-                <section className="w-full lg:w-[30%] lg:pl-6 border-l">
+                <section className="w-full mt-20 xl:mt-0 xl:w-[50%] 2xl:w-[40%] 3xl:w-[30%] xl:pl-6 border-l">
                     {/* Sidebar or additional details can go here */}
-                    <div className="grid grid-cols-2 mb-3">
+                    <div className="grid grid-cols-2 mb-3 space-x-3">
                         {categories.map((category, index) => (
                             <div 
                                 key={index} 
-                                className={`text-center border border-gray-400 p-4 m-2 rounded-lg hover:shadow-lg cursor-pointer
+                                className={`text-center border border-gray-400 p-4 rounded-lg hover:shadow-lg cursor-pointer
                                     ${selectedCategory === category ? 'bg-[rgb(0,0,30)] text-amber-500' : 'bg-white text-gray-900'}`}
                                 onClick={() => handleCategoryClick(category)}
                             >
@@ -223,7 +228,7 @@ const HouseForSaleDetails = () => {
                     
                     {/* Additional content based on selected category can go here */}
                     {selectedCategory === "Request Info" && (
-                        <div className="p-2">
+                        <div className="w-full">
                             <h3 className="text-gray-900 text-lg font-semibold mb-2">Request More Information</h3>
                             <p className="text-gray-700">Fill out the form below to request more information about this property.</p>
                             {/* Form fields can be added here */}
@@ -264,7 +269,7 @@ const HouseForSaleDetails = () => {
                         </div>
                     )}
                     {selectedCategory === "Schedule a Visit" && (
-                        <div className="p-2 w-full">
+                        <div className="w-full">
                             <h3 className="text-gray-900 text-lg font-semibold mb-2">Schedule a Visit</h3>
                             <p className="text-gray-700 mb-2 font-semibold">Choose a date and time to visit the property.</p>
                             {/* Date and time picker can be added here */}

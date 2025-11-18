@@ -157,7 +157,7 @@ export default function HousesForSale() {
             <h1 className="text-2xl font-bold text-gray-800">Houses For Sale</h1>
             <span className="text-xl font-bold text-blue-600 hover:underline hover:cursor-pointer">View All</span>
         </p>
-      <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-6">
         {listings.map((listing) => (
           <div
             key={listing.id}
