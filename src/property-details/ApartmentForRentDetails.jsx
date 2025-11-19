@@ -136,8 +136,8 @@ const ApartmentForRentDetails = () => {
             </div>
 
             {/* Details Section */}
-            <div className="relative flex w-full px-6">
-                <section className="relative w-[70%]">
+            <div className="relative flex flex-col lg:flex-row w-full px-6">
+                <section className="relative w-full lg:w-[60%] xl:w-[50%] 2xl:w-[60%] 3xl:w-[65%]">
                     {/* Custom Navigation Buttons */}
                     <div className={`absolute top-[250px] left-2 z-10 -translate-y-1/2 cursor-pointer swiper-button-prev-${house.id} bg-black/50 p-2 rounded-full text-white hover:bg-black/70`}>
                         <ChevronLeft size={20} />
@@ -205,7 +205,9 @@ const ApartmentForRentDetails = () => {
                         <button className="bg-[rgb(0,0,30)] text-amber-500 px-4 py-2 rounded hover:bg-black transition hover:scale-105 hover:duration-700 hover:ease-in-out cursor-pointer">Contact Seller</button>
                     </div>
                 </section>
-                <section className="w-[30%] pl-6 border-l">
+
+                {/* Sidebar Section */}
+                <section className="w-full mt-20 lg:mt-0 lg:w-[40%] xl:w-[50%] 2xl:w-[40%] 3xl:w-[35%] lg:pl-6 border-l">
                     {/* Sidebar or additional details can go here */}
                     <div className="grid grid-cols-2 mb-3">
                         {categories.map((category, index) => (
@@ -341,7 +343,7 @@ const ApartmentForRentDetails = () => {
             {/* Similar Apartments Section */}
             <div className="mt-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 px-6">Similar Apartment Rentals</h2>
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 sm:gap-4 md:gap-6 px-6">
+                <div className="grid lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-6 px-6">
                     {similarApartmentsForRent.map((similarApartment) => (
                         <div 
                             key={similarApartment.id}

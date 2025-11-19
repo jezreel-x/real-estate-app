@@ -140,8 +140,8 @@ const HouseForSaleDetails = () => {
             <div className="text-gray-600 text-sm font-semibold px-6">Current breakpoint: {breakpoint}</div>
 
             {/* Details Section */}
-            <div className="relative flex flex-col xl:flex-row w-full px-6">
-                <section className="relative w-full xl:w-[50%] 2xl:w-[60%] 3xl:w-[70%]">
+            <div className="relative flex flex-col lg:flex-row w-full px-6">
+                <section className="relative w-full lg:w-[60%] xl:w-[50%] 2xl:w-[60%] 3xl:w-[65%]">
                     {/* Custom Navigation Buttons */}
                     <div className={`absolute top-[250px] left-2 z-10 -translate-y-1/2 cursor-pointer swiper-button-prev-${house.id} bg-black/50 p-2 rounded-full text-white hover:bg-black/70`}>
                         <ChevronLeft size={20} />
@@ -211,7 +211,7 @@ const HouseForSaleDetails = () => {
                 </section>
 
                 {/* Sidebar Section */}
-                <section className="w-full mt-20 xl:mt-0 xl:w-[50%] 2xl:w-[40%] 3xl:w-[30%] xl:pl-6 border-l">
+                <section className="w-full mt-20 lg:mt-0 lg:w-[40%] xl:w-[50%] 2xl:w-[40%] 3xl:w-[35%] lg:pl-6 border-l">
                     {/* Sidebar or additional details can go here */}
                     <div className="grid grid-cols-2 mb-3 space-x-3">
                         {categories.map((category, index) => (
@@ -347,7 +347,7 @@ const HouseForSaleDetails = () => {
             {/* Similar Houses Section */}
             <div className="mt-8">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-4 px-6">Similar Houses</h2>
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 sm:gap-4 md:gap-6 px-6">
+                <div className="grid lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 gap-6 px-6">
                     {similarHouses.map((similarHouse) => (
                         <div 
                             key={similarHouse.id}
