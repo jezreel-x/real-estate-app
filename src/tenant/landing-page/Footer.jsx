@@ -32,7 +32,7 @@ const Footer = () => {
             {/* Contacts Section */}
             <div className="space-y-3">
                 <h3 className="font-bold text-xl mb-3">Contacts</h3>
-                <p className="text-gray-300">+254 113 273 333</p>
+                <p className="text-gray-300">+254 701 234 567</p>
                 <p>
                 <a
                     href="mailto:info@airhousing.co.ke"

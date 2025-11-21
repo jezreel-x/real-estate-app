@@ -276,7 +276,7 @@ const Navbar = () => {
                 </li>
             </ul>
 
-            <div id="div1" className="hidden space-x-4 xl:flex xl:space-x-8">
+            <div id="div1" className="hidden space-x-4 2xl:flex 2xl:space-x-8">
                 <button
                     type="button"
                     className="bg-[rgb(0,0,30)] text-amber-500 min-h-[48px] py-2 px-6 rounded-full shadow-md hover:scale-110 hover:transition duration-900 ease-in-out hover:bg-[#FFD700] hover:text-black hover:cursor-pointer flex items-center justify-center sm:w-36 md:w-32"
@@ -301,14 +301,14 @@ const Navbar = () => {
                 </button>
             </div>
 
-            <div className="xl:hidden">
+            <div className="2xl:hidden">
                 <button className="text-amber-500 hover:cursor-pointer" type="button" onClick={handleClick}>
                     {isOpen ? <X size={36} /> : <Menu size={36} />}
                 </button>
             </div>
 
             {isOpen && (
-                <div className="absolute top-16 right-2 rounded-lg sm:w-64 md:w-68 lg:w-80 bg-white shadow-md flex flex-col items-center space-y-2 p-4 xl:hidden">
+                <div className="absolute top-16 right-2 rounded-lg sm:w-64 md:w-68 lg:w-80 bg-white shadow-md flex flex-col items-center space-y-2 p-4 2xl:hidden">
                     {menuButtons.map((text, index) => (
                         <button
                             type="button"
