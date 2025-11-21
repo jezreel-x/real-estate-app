@@ -1,10 +1,10 @@
 import { lazy } from "react";
 import { Route } from "react-router-dom";
 
-const HouseForSaleDetails = lazy(() => import("../../property-details/HouseForSaleDetails"));
-const ApartmentForSaleDetails = lazy(() => import("../../property-details/ApartmentForSaleDetails"));
-const HouseForRentDetails = lazy(() => import("../../property-details/HouseForRentDetails"));
-const ApartmentForRentDetails = lazy(() => import("../../property-details/ApartmentForRentDetails"));
+const HouseForSaleDetails = lazy(() => import("../../tenant/property-details/HouseForSaleDetails"));
+const ApartmentForSaleDetails = lazy(() => import("../../tenant/property-details/ApartmentForSaleDetails"));
+const HouseForRentDetails = lazy(() => import("../../tenant/property-details/HouseForRentDetails"));
+const ApartmentForRentDetails = lazy(() => import("../../tenant/property-details/ApartmentForRentDetails"));
 
 const propertyInfoRoutes = [
     <Route path="/houses-for-sale/details" element={<HouseForSaleDetails />} key="property-info" />,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import bg from '../assets/apartments.jpg';
+import bg from '../../assets/apartments.jpg';
 
 
 export default function HeroSection() {

@@ -2,7 +2,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { Routes, Route } from 'react-router-dom';
-import LandingPage from './landing-page/LandingPage.jsx';
+import LandingPage from "./tenant/landing-page/LandingPage.jsx";
 import signUpRoutes from './routes/sign-ups/sign-ups.jsx';
 import propertyInfoRoutes from './routes/property-info/property-info.jsx';
 // import { BrowserRouter } from 'react-router-dom'

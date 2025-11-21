@@ -91,7 +91,7 @@ const SignUp = () => {
             tenant: "/",
             agent: "/agent",
             serviceprovider: "/service-provider",
-            admin: "/admin",
+            propertymanager: "/property-manager",
         }; // Redirect to dashboard or another page after SignUp
 
         const redirectPath = roleRoutes[role] || "/";
