@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import LandingPage from "./tenant/landing-page/LandingPage.jsx";
 import signUpRoutes from './routes/sign-ups/sign-ups.jsx';
 import propertyInfoRoutes from './routes/property-info/property-info.jsx';
+import propertyManagerRoutes from "./routes/property-manager/property-manager.jsx";
 // import { BrowserRouter } from 'react-router-dom'
 // import Hello from './landing-page/Hello.jsx'
 
@@ -34,6 +35,7 @@ function App() {
         <Route path='/' element={<LandingPage />} />
         {signUpRoutes}
         {propertyInfoRoutes}
+        {propertyManagerRoutes}
       </Routes>
 
     </div>
