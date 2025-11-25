@@ -58,7 +58,7 @@ export default function Sidebar({
   return (
     <>
       {/* Mobile top bar with toggle */}
-      <div className="md:hidden flex items-center justify-between bg-slate-900 text-white px-3 py-2 border-b border-slate-700">
+      <div className="mt-0 md:mt-24 md:hidden flex items-center justify-between bg-slate-900 text-white px-3 py-2 border-b border-slate-700">
         <div className="flex items-center gap-2">
           <button
             aria-label="toggle sidebar"
