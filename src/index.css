@@ -85,6 +85,27 @@
   display: block;
 }
 
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 6px;        /* slender scroll */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6b7280;  /* Tailwind gray-500 */
+  border-radius: 10000px;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #6b7280 transparent;
+}
+
+
 
 /* a {
   font-weight: 500;

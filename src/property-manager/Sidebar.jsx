@@ -17,36 +17,32 @@ import {
 import { NavLink, useLocation } from "react-router-dom"; // optional, used if you have react-router
 
 const MENU = [
-  { id: "home", label: "Home", icon: Home, to: "/home" },
+  { id: "home", label: "Home", icon: Home},
   { id: "dashboard", label: "Dashboard", icon: Home, to: "/dashboard" },
   { id: "users", label: "Users", icon: Users, to: "/users" },
   { id: "roles", label: "Roles", icon: Anchor, to: "/roles" },
-  { id: "business", label: "Business Management", icon: Briefcase, to: "/business" },
-  { id: "property", label: "Property", icon: Building2, to: "/property" },
+  { id: "business", label: "Business Management", icon: Briefcase},
+//   { id: "property", label: "Property", icon: Building2, to: "/property" },
   { id: "inquiries", label: "Inquiries", icon: Briefcase, to: "/inquiries" },
   { id: "tenant", label: "Tenant", icon: Package, to: "/tenant" },
   { id: "invoice", label: "Invoice", icon: FileText, to: "/invoice" },
   { id: "expense", label: "Expense", icon: ClipboardList, to: "/expense" },
   { id: "maintainer", label: "Maintainer", icon: Wrench, to: "/maintainer" },
   { id: "requests", label: "Maintenance Request", icon: Layers, to: "/requests" },
+  { id: "additional", label: "Additional Options", icon: Layers },
+  { id: "reports", label: "Reports", icon: FileText, to: "/reports" },
+  { id: "support", label: "Support", icon: Users, to: "/support" },
+  { id: "notes", label: "Notes", icon: ClipboardList, to: "/notes" },
 ];
 
-export default function Sidebar({
-  // optional props to control behaviour externally
-  initialExpanded = true,
-//   collapseBelow = "md", // collapse at tailwind breakpoint name
-}) {
+export default function Sidebar() {
   // expanded on mount
-  const [expanded, setExpanded] = useState(initialExpanded);
+  const [expanded, setExpanded] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = typeof window !== "undefined" ? window.location.pathname : "/";
 
   // If you use react-router uncomment:
   // const location = useLocation();
-
-  useEffect(() => {
-    setExpanded(initialExpanded);
-  }, [initialExpanded]);
 
   // Helper for active route. If you use react-router, replace this with NavLink's isActive.
   const isActive = (to) => {
@@ -57,105 +53,112 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Mobile top bar with toggle */}
-      <div className="mt-0 md:mt-24 md:hidden flex items-center justify-between bg-slate-900 text-white px-3 py-2 border-b border-slate-700">
-        <div className="flex items-center gap-2">
-          <button
-            aria-label="toggle sidebar"
-            className="p-2 rounded-md hover:bg-slate-800"
-            onClick={() => setMobileOpen((v) => !v)}
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="text-lg font-semibold">App Name</div>
+        {/* Mobile top bar with toggle */}
+        <div className="md:hidden flex items-center justify-between bg-slate-900 text-white px-3 py-2 border-b border-slate-700">
+            <div className="flex items-center gap-2">
+                <button
+                    aria-label="toggle sidebar"
+                    className="p-2 rounded-md hover:bg-slate-800"
+                    onClick={() => setMobileOpen((v) => !v)}
+                >
+                    <Menu className="w-5 h-5" />
+                </button>
+                <div className="text-lg font-semibold">App Name</div>
+            </div>
+            <div className="flex items-center gap-3">
+                <div className="text-sm text-slate-300">Owner</div>
+                <Settings className="w-5 h-5" />
+            </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="text-sm text-slate-300">Owner</div>
-          <Settings className="w-5 h-5" />
-        </div>
-      </div>
 
-      <div className="flex">
         {/* Sidebar (desktop) */}
         <aside
           // Responsive: hide or translate on small screens when mobileOpen=false
-          className={`
-            fixed top-0 left-0 h-full z-30 transform bg-slate-900 text-slate-100 border-r border-slate-700
-            transition-all duration-300 ease-in-out
-            ${expanded ? "w-64" : "w-20"}
-            md:static md:translate-x-0
-            ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-          `}
-          onMouseEnter={() => setExpanded(true)}
-          onMouseLeave={() => {
-            // collapse only on desktop and when user didn't explicitly expand
-            // respects responsive collapseBelow prop via tailwind classes (see usage notes)
-            setExpanded(false);
-          }}
+            className={`
+                fixed left-0 h-screen overflow-y-auto z-10 transform bg-[rgb(0,0,30)] text-amber-500 border-r border-slate-700
+                transition-all duration-300 ease-in-out
+                ${expanded ? "w-64" : "w-20"}
+                md:static md:translate-x-0
+            `}
+            onMouseEnter={() => setExpanded(true)}
+            onMouseLeave={() => {
+                // collapse only on desktop and when user didn't explicitly expand
+                // respects responsive collapseBelow prop via tailwind classes (see usage notes)
+                setExpanded(false);
+            }}
         >
-          {/* Logo area */}
-          <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-800">
-            <img
-              src="/mnt/data/Screenshot (774).png"
-              alt="theme logo"
-              className={`h-8 w-8 object-cover rounded ${expanded ? "mr-2" : "mx-auto"}`}
-              // -- developer note: path points to uploaded screenshot; transform to URL in your environment
-            />
-            <div className={`flex-1 transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-              <div className="text-sm font-semibold">Air Housing</div>
-              <div className="text-xs text-slate-400">Owner admin</div>
-            </div>
-          </div>
+            {/* Logo area */}
+            {/* <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-800">
+                <img
+                src="/mnt/data/Screenshot (774).png"
+                alt="theme logo"
+                className={`h-8 w-8 object-cover rounded ${expanded ? "mr-2" : "mx-auto"}`}
+                // -- developer note: path points to uploaded screenshot; transform to URL in your environment
+                />
+                <div className={`flex-1 transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+                    <div className="text-sm font-semibold">Air Housing</div>
+                    <div className="text-xs text-slate-400">Owner admin</div>
+                </div>
+            </div> */}
 
-          {/* Menu */}
-          <nav className="mt-4 px-1">
+            
+            {/* Menu */}
             {MENU.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.to, item.id);
+            const Icon = item.icon;
+            const active = isActive(item.to);
 
-              return (
-                <div key={item.id} className="relative group">
-                  {/* Link: if you have react-router, wrap with <NavLink to={item.to}> */}
-                  <a
+            return (
+                <div 
+                    key={item.id} 
+                    className="relative group"
+                >
+                {/* Link: if you have react-router, wrap with <NavLink to={item.to}> */}
+                <a
                     href={item.to}
                     className={`
-                      flex items-center gap-3 px-3 py-3 mx-2 rounded-md transition-colors duration-200
-                      ${active ? "bg-gradient-to-r from-slate-700/70 to-slate-700/40 ring-1 ring-slate-600" : "hover:bg-slate-800"}
-                      ${expanded ? "justify-start" : "justify-center"}
+                    flex items-center gap-3 px-3 py-3 mx-2 rounded-md transition-colors duration-200
+                    ${active ? "bg-gradient-to-r from-slate-700/70 to-slate-700/40 ring-1 ring-slate-600" : "hover:bg-slate-800"}
+                    ${item.label === "Home" || item.label === "Business Management"|| item.label === "Additional Options"
+                         ? "text-amber-500 border-l-2 border-amber-500 pointer-events-none bg-slate-500" : ""}
                     `}
-                    aria-current={active ? "page" : undefined}
-                  >
-                    <Icon className={`w-5 h-5 flex-shrink-0 ${active ? "text-sky-400" : "text-slate-300 group-hover:text-slate-100"}`} />
+                    // aria-current={active ? "page" : undefined}
+                >
+                    <Icon 
+                        className={`w-5 h-5 flex-shrink-0 
+                            ${active ? "text-sky-400" : "text-slate-300 group-hover:text-slate-100"}
+                            ${expanded ? "" : "mx-auto"}`
+                        } 
+                    />
                     {/* label */}
                     <span
-                      className={`text-sm font-medium transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                        className={`text-sm font-medium transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}
                     >
-                      {item.label}
+                        {item.label}
                     </span>
-                  </a>
+                </a>
 
-                  {/* Tooltip when collapsed */}
-                  {!expanded && (
+                {/* Tooltip when collapsed */}
+                {/* {expanded === "false" && (
                     <div
-                      role="tooltip"
-                      className="absolute left-full top-1/2 -translate-y-1/2 ml-3 whitespace-nowrap rounded-md py-1 px-2 text-sm bg-slate-800 text-slate-100 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
-                      aria-hidden={!expanded}
+                        role="tooltip"
+                        className="absolute left-full top-1/2 -translate-y-1/2 ml-3 whitespace-nowrap rounded-md py-1 px-2 text-sm bg-slate-800 text-slate-100 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200"
+                        // aria-hidden={!expanded}
                     >
-                      {item.label}
+                        {item.label}
                     </div>
-                  )}
+                )} */}
                 </div>
-              );
+            );
             })}
-          </nav>
+        
 
-          {/* Footer / small controls */}
-          <div className="mt-auto px-3 py-4 border-t border-slate-800">
-            <div className={`flex items-center gap-3 px-2 py-2 rounded-md hover:bg-slate-800 cursor-pointer ${expanded ? "" : "justify-center"}`}>
-              <Settings className="w-5 h-5" />
-              <span className={`text-sm ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}>Settings</span>
+            {/* Footer / small controls */}
+            <div className="mt-auto px-3 py-4 border-t border-slate-800">
+                <div className={`flex items-center gap-3 px-2 py-2 rounded-md hover:bg-slate-800 cursor-pointer ${expanded ? "" : "justify-center"}`}>
+                    <Settings className="w-5 h-5" />
+                    <span className={`text-sm ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}>Settings</span>
+                </div>
             </div>
-          </div>
         </aside>
 
         {/* Background overlay for mobile when sidebar open */}
@@ -189,7 +192,6 @@ export default function Sidebar({
             <div className="mt-6 bg-[#071127] rounded-md min-h-[60vh] border border-slate-800" />
           </div>
         </main> */}
-      </div>
     </>
   );
 }

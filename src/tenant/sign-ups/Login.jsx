@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-import logo from '../assets/black.png';
+import logo from '../../assets/black.png';
 
 import { notify } from "@custom-components/toastHelper";
 
@@ -42,10 +42,14 @@ const Login = () => {
             return notify("error", "Wrong password or username.");
         } 
 
-        // Perform login logic here
-        notify("info", "Redirecting to OTP Delivery Method Page...");
-
         const { role, name, phone } = user;
+
+        // Perform login logic here
+        if (role === "customer") {
+            notify("success", "Login successful! Redirecting to OTP delivery method...");
+        } else {
+            notify("success", "Login successful! Redirecting to dashboard...");
+        }
 
         const finalEmail = userByEmail ? input : Object.keys(users).find(
             key => users[key].phone === input
@@ -62,7 +66,8 @@ const Login = () => {
             customer: "/otp-delivery-method",
             agent: "/agent",
             serviceprovider: "/serviceprovider",
-            admin: "/admin",
+            propertymanager: "/property-manager/dashboard",
+
         }; // Redirect to dashboard or another page after login
 
         const redirectPath = roleRoutes[role] || "/";

@@ -18,10 +18,10 @@ export const dummyUsers = {
     name: "Hannah ServiceProvider",
     phone: "0701000003",
   },
-  "admin@airhousing.co.ke":{
-    role: "admin",
+  "propertymanager@airhousing.co.ke":{
+    role: "propertymanager",
     password: "AirHousing@2023",
-    name: "Admin User",
+    name: "Property Manager",
     phone: "0701000004",
   }
 };

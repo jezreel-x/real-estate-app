@@ -34,12 +34,12 @@ const PropertyManagerNavbar = () => {
 
     return (
         <>
-            <div className="flex h-24 w-full fixed top-0 left-0 z-50 bg-[rgb(0,0,30)] justify-between items-center py-1 px-6 md:px-8">
+            <div className="flex h-20 w-full fixed top-0 left-0 z-50 bg-[rgb(0,0,30)] justify-between items-center py-1 px-6 md:px-8">
                 {/* Logo */}
                 <img
                     src={logo}
                     alt="Logo"
-                    className="w-24 h-auto"
+                    className="w-20 h-auto"
                 />
 
                 <ul className="hidden md:flex gap-10">

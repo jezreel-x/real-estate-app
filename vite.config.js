@@ -9,7 +9,7 @@ export default defineConfig({
     tailwindcss()
   ],
   resolve: { alias: {
-      '@custom-components': '/src/custom-components',
+      '@custom-components': '/src/tenant/custom-components',
       '@assets': '/src/assets',
     },
   },
