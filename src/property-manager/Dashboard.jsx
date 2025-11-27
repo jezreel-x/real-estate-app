@@ -22,7 +22,7 @@ const Dashboard = () => {
             setDummyData(dummyChartData(range));
 
             notify("success", `Data loaded for: ${range}`);
-        }, 1000);
+        }, 4000);
     };
 
     const cards = [
@@ -121,16 +121,16 @@ const Dashboard = () => {
                 <PropertyManagerNavbar />
                 <div className="flex mt-20">
                     <Sidebar />
-                    <div className="flex flex-1 flex-col">
-                        <div className="px-4 pt-4 pb-0 min-h-screen">
+                    <div className="flex flex-1 max-w-[calc(100vw-16rem)] mx-auto flex-col min-h-screen">
+                        <div className="px-4 pt-4 pb-0">
                             <h1 className="text-2xl font-bold mb-4 text-gray-700">Dashboard</h1>
 
                             {/* Dashboard content goes here */}
-                            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+                            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {cards.map(card => (
                                     <div 
                                         key={card.id}
-                                        className="bg-white rounded-lg shadow p-6 flex flex-col items-center"
+                                        className="bg-white rounded-lg shadow p-6 flex flex-col items-center transition-transform transform hover:scale-105 cursor-pointer"
                                     >
                                         <h2 className="text-md font-semibold text-gray-600 mb-2">{card.title}</h2>
                                         <p className="text-lg font-bold text-gray-800">{card.value}</p>
@@ -147,7 +147,7 @@ const Dashboard = () => {
                                     {['1y', '2y', '5y', '10y'].map((dateRange) => (
                                         <button
                                             key={dateRange}
-                                            className={`px-4 py-2 cursor-pointer rounded-lg ${selectedRange === dateRange ? 'bg-[rgb(0,0,30)] text-amber-500' : 'bg-[rgb(0,0,30)] text-blue-500 hover:bg-slate-700'}`}
+                                            className={`px-4 py-2 cursor-pointer rounded-lg ${selectedRange === dateRange ? 'bg-[rgb(0,0,30)] text-amber-500' : 'bg-[rgb(0,0,30)] text-white hover:bg-slate-700'}`}
                                             onClick={() => handleDateRangeChange(dateRange)}
                                         >
                                             {dateRange}
@@ -212,9 +212,9 @@ const Dashboard = () => {
                         </div>
 
                         {/* Bottom Copyright Section */}
-                        <div className="w-full border-t bg-[rgb(0,0,30)] border-gray-500 mt-12 py-6 text-center text-sm text-gray-300">
+                        {/* <div className="w-full border-t mt-8 bg-[rgb(0,0,30)] border-gray-500 py-6 text-center text-sm text-gray-300">
                             <p>&copy; 2025 AirHousing. All rights reserved.</p>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

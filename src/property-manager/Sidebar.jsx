@@ -18,8 +18,8 @@ import { NavLink, useLocation } from "react-router-dom"; // optional, used if yo
 
 const MENU = [
   { id: "home", label: "Home", icon: Home},
-  { id: "dashboard", label: "Dashboard", icon: Home, to: "/dashboard" },
-  { id: "users", label: "Users", icon: Users, to: "/users" },
+  { id: "dashboard", label: "Dashboard", icon: Home, to: "/property-manager/dashboard" },
+  { id: "users", label: "Users", icon: Users, to: "/property-manager/users" },
   { id: "roles", label: "Roles", icon: Anchor, to: "/roles" },
   { id: "business", label: "Business Management", icon: Briefcase},
 //   { id: "property", label: "Property", icon: Building2, to: "/property" },
@@ -75,7 +75,7 @@ export default function Sidebar() {
         <aside
           // Responsive: hide or translate on small screens when mobileOpen=false
             className={`
-                fixed left-0 min-h-screen overflow-y-auto z-10 transform bg-[rgb(0,0,30)] text-amber-500 border-r border-slate-700
+                fixed left-0 h-screen overflow-y-auto z-10 transform bg-[rgb(0,0,30)] text-amber-500 border-r border-slate-700
                 transition-all duration-300 ease-in-out
                 ${expanded ? "w-64" : "w-20"}
                 md:static md:translate-x-0
@@ -117,15 +117,15 @@ export default function Sidebar() {
                     href={item.to}
                     className={`
                     flex items-center gap-3 px-3 py-3 mx-2 rounded-md transition-colors duration-200
-                    ${active ? "bg-gradient-to-r from-slate-700/70 to-slate-700/40 ring-1 ring-slate-600" : "hover:bg-slate-800"}
-                    ${item.label === "Home" || item.label === "Business Management"|| item.label === "Additional Options"
+                    ${active ? "text-white" : "hover:bg-slate-800"}
+                    ${item.label === "Home" || item.label === "Business Management" || item.label === "Additional Options"
                          ? "text-amber-500 border-l-2 border-amber-500 pointer-events-none bg-slate-500" : ""}
                     `}
                     // aria-current={active ? "page" : undefined}
                 >
                     <Icon 
                         className={`w-5 h-5 flex-shrink-0 
-                            ${active ? "text-sky-400" : "text-slate-300 group-hover:text-slate-100"}
+                            ${active ? "text-white" : "text-slate-300 group-hover:text-slate-100"}
                             ${expanded ? "" : "mx-auto"}`
                         } 
                     />
