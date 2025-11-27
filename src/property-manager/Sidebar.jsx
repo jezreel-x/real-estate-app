@@ -75,7 +75,7 @@ export default function Sidebar() {
         <aside
           // Responsive: hide or translate on small screens when mobileOpen=false
             className={`
-                fixed left-0 h-screen overflow-y-auto z-10 transform bg-[rgb(0,0,30)] text-amber-500 border-r border-slate-700
+                fixed left-0 min-h-screen overflow-y-auto z-10 transform bg-[rgb(0,0,30)] text-amber-500 border-r border-slate-700
                 transition-all duration-300 ease-in-out
                 ${expanded ? "w-64" : "w-20"}
                 md:static md:translate-x-0
