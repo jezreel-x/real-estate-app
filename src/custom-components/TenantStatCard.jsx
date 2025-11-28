@@ -1,7 +1,7 @@
 {/* StatCard.jsx */}
 export function TenantStatCard({ title, value, icon: Icon, iconColor, iconBgColor, subtitle }) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-lg shadow border border-gray-200 p-6 cursor-pointer hover:shadow-lg transition-shadow duration-300">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>

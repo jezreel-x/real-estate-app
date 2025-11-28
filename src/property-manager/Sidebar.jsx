@@ -54,7 +54,7 @@ export default function Sidebar() {
   return (
     <>
         {/* Mobile top bar with toggle */}
-        <div className="md:hidden flex items-center justify-between bg-slate-900 text-white px-3 py-2 border-b border-slate-700">
+        {/* <div className="md:hidden flex items-center justify-between bg-slate-900 text-white px-3 py-2 border-b border-slate-700">
             <div className="flex items-center gap-2">
                 <button
                     aria-label="toggle sidebar"
@@ -69,7 +69,7 @@ export default function Sidebar() {
                 <div className="text-sm text-slate-300">Owner</div>
                 <Settings className="w-5 h-5" />
             </div>
-        </div>
+        </div> */}
 
         {/* Sidebar (desktop) */}
         <aside

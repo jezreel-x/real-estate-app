@@ -14,3 +14,8 @@ export default defineConfig({
     },
   },
 })
+// understand code created yesterday
+// go ahead and create more code today for other menu items if needed
+
+
+// End of vite.config.js

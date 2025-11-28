@@ -1,7 +1,7 @@
 import React from "react";
 import { TenantStatCard } from "@custom-components/TenantStatCard";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
-import { Users, FileText, DollarSign, TrendingUp, Plus } from 'lucide-react';
+import { Users, FileText, DollarSign, TrendingUp, Plus, Search } from 'lucide-react';
 import Sidebar from "./Sidebar";
 import { AddInvoiceModal } from "@custom-components/AddInvoiceModal";
 import { AddTenantModal } from "@custom-components/AddTenantModal";
@@ -80,11 +80,11 @@ const User = () => {
                             </div>
 
                             {/* Additional content such as tenant list/table can go here */}
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow duration-300 border border-gray-200">
                                 <div className="border-b border-gray-200">
                                     <div className="flex items-center justify-between px-6 py-4">
                                         <div className="flex gap-4">
-                                            <button
+                                            {/* <button
                                                 onClick={() => setActiveTab('tenants')}
                                                 className={`px-4 py-2 font-medium cursor-pointer rounded-lg transition-colors ${
                                                     activeTab === 'tenants'
@@ -103,16 +103,27 @@ const User = () => {
                                                 }`}
                                             >
                                                 Invoices
-                                            </button>
+                                            </button> */}
+                                            {[{label: 'Tenants', value: 'tenants'}, {label: 'Invoices', value: 'invoices'}].map((tab) => (
+                                                <button
+                                                    key={tab.value}
+                                                    onClick={() => setActiveTab(tab.value)}
+                                                    className={`px-4 py-2 font-medium cursor-pointer rounded-lg transition-colors ${
+                                                        activeTab === tab.value ? 'bg-[rgb(0,0,30)] text-amber-500' : 'text-gray-600 hover:bg-gray-100'
+                                                    }`}
+                                                >
+                                                    {tab.label}
+                                                </button>
+                                            ))}
                                         </div>
                                         <button
                                             onClick={() =>
-                                            activeTab === 'tenants' ? setShowAddTenantModal(true) : setShowAddInvoiceModal(true)
+                                                activeTab === 'tenants' ? setShowAddTenantModal(true) : setShowAddInvoiceModal(true)
                                             }
-                                            className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                            className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
                                         >
-                                            <Plus className="w-5 h-5" />
-                                            Add {activeTab === 'tenants' ? 'Tenant' : 'Invoice'}
+                                            <Plus className="w-5 h-5 text-amber-500" />
+                                            <span className="text-amber-500">Add {activeTab === 'tenants' ? 'Tenant' : 'Invoice'}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -127,17 +138,68 @@ const User = () => {
                                             <p className="text-gray-600 mb-4">Get started by adding your first tenant</p>
                                             <button
                                                 onClick={() => setShowAddTenantModal(true)}
-                                                className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                                className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
                                             >
-                                                <Plus className="w-5 h-5" />
-                                                Add Tenant
+                                                <Plus className="w-5 h-5 text-amber-500" />
+                                                <span className="text-amber-500">Add Tenant</span>
                                             </button>
                                         </div>
                                         ) : (
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                            {tenants.map((tenant) => (
-                                                <TenantCard key={tenant.id} tenant={tenant} onClick={() => {}} />
-                                            ))}
+                                        // <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        //     {tenants.map((tenant) => (
+                                        //         <TenantCard key={tenant.id} tenant={tenant} onClick={() => {}} />
+                                        //     ))}
+                                        // </div>
+
+                                        // New tenant table
+                                        <div>
+                                            {/* Include a search bar above the table to filter tenants by name, email, or phone */}
+                                            <div className="mb-4 relative">
+                                                {/* Add an icon inside the search input if desired */}
+                                                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Search tenants by name, email, or phone"
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 pl-10"
+                                                    // Add onChange handler to update search state here
+                                                />
+                                            </div>
+
+                                            {/* Tenant Table */}
+                                            <div className="overflow-x-auto">
+                                                <table className="min-w-full divide-y divide-gray-200">
+                                                    <thead className="bg-gray-50">
+                                                        <tr>
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rent Amount</th>
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="bg-white divide-y divide-gray-200">
+                                                        {tenants.map((tenant) => (
+                                                        <tr key={tenant.id} className="hover:bg-gray-50 cursor-pointer">
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tenant.name}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.email}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.phone}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${Number(tenant.rent_amount).toLocaleString()}</td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${tenant.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                                    {tenant.status.charAt(0).toUpperCase() + tenant.status.slice(1)}
+                                                                </span>
+                                                            </td>
+                                                            {/* Actions column has edit/delete buttons */}
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                <button className="text-blue-600 hover:text-blue-900 mr-4">Edit</button>
+                                                                <button className="text-red-600 hover:text-red-900">Delete</button>
+                                                            </td>
+                                                        </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                         )}
                                     </div>
