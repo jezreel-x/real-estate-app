@@ -58,11 +58,11 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                             required
                             value={formData.tenant_id}
                             onChange={(e) => setFormData({ ...formData, tenant_id: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                            <option value="">Select a tenant</option>
+                            <option className='text-gray-900' value="" disabled>Select a tenant</option>
                             {tenants.map((tenant) => (
-                            <option key={tenant.id} value={tenant.id}>
+                            <option className='text-gray-900' key={tenant.id} value={tenant.id}>
                                 {tenant.name} - Plot {tenant.plot_number}
                             </option>
                             ))}
@@ -78,7 +78,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                             required
                             value={formData.invoice_number}
                             onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="INV-001"
                         />
                     </div>
@@ -90,11 +90,12 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                         <input
                             type="number"
                             required
+                            inputMode='decimal'
                             min="0"
-                            step="0.01"
+                            // step="0.01"
                             value={formData.amount}
                             onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
@@ -107,7 +108,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                             required
                             value={formData.due_date}
                             onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
@@ -118,11 +119,11 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                         <select
                             value={formData.status}
                             onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
-                            <option value="pending">Pending</option>
-                            <option value="paid">Paid</option>
-                            <option value="overdue">Overdue</option>
+                            <option className='text-gray-900' value="pending">Pending</option>
+                            <option className='text-gray-900' value="paid">Paid</option>
+                            <option className='text-gray-900' value="overdue">Overdue</option>
                         </select>
                     </div>
 
@@ -135,7 +136,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                         type="date"
                         value={formData.paid_date || ''}
                         onChange={(e) => setFormData({ ...formData, paid_date: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     )}
@@ -149,7 +150,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Monthly rent payment, maintenance fee, etc."
                     />
                 </div>
@@ -158,14 +159,14 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex-1 cursor-pointer px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex-1 cursor-pointer px-4 py-2 border border-gray-300 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="flex-1 cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 cursor-pointer px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? 'Creating...' : 'Create Invoice'}
                     </button>

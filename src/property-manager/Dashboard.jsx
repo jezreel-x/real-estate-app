@@ -9,6 +9,7 @@ const Dashboard = () => {
     
     const [selectedRange, setSelectedRange] = useState('1y');
     const [dummyData, setDummyData] = useState(dummyChartData('1y'));
+    const [expanded, setExpanded] = useState(true);
 
     const handleDateRangeChange = (range) => {
         setSelectedRange(range);
@@ -30,12 +31,12 @@ const Dashboard = () => {
         { id: 2, title: "Total Tenants", value: 300 },
         { id: 3, title: "Occupied Units", value: 95 },
         { id: 4, title: "Vacant Units", value: 25 },
-        { id: 5, title: "Total Income", value: "$150,000" },
-        { id: 6, title: "Monthly Rent Collected", value: "$45,000" },
+        { id: 5, title: "Total Income", value: "KES 150,000" },
+        { id: 6, title: "Monthly Rent Collected", value: "KES 45,000" },
         { id: 7, title: "Pending Maintenance Requests", value: 8 },
         { id: 8, title: "New Inquiries", value: 15 },
         { id: 9, title: "Upcoming Lease Expirations", value: 5 },
-        { id: 10, title: "Total Expenses", value: "$30,000" },
+        { id: 10, title: "Total Expenses", value: "KES 30,000" },
     ];
 
     // const dummyChartData = (range) => {};
@@ -120,9 +121,10 @@ const Dashboard = () => {
             <div className="flex flex-col w-full bg-gray-100">
                 <PropertyManagerNavbar />
                 <div className="flex mt-20">
-                    <Sidebar />
-                    <div className="flex flex-1 max-w-[calc(100vw-16rem)] mx-auto flex-col min-h-screen">
-                        <div className="px-4 pt-4 pb-0">
+                    <Sidebar expanded={expanded} setExpanded={setExpanded} />
+                    <div className={`flex flex-1 flex-col min-h-screen
+                    transition-all duration-300 ease-in-out ${expanded ? "ml-64" : "ml-20"}`}>
+                        <div className="px-4 pt-4 pb-0 max-w-[calc(100vw-16rem)] mx-auto w-full">
                             <h1 className="text-2xl font-bold mb-4 text-gray-700">Dashboard</h1>
 
                             {/* Dashboard content goes here */}

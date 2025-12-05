@@ -1,7 +1,7 @@
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { useState } from 'react';
 
-export function AddTenantModal({ isOpen, onClose, onSubmit }) {
+export function AddTenantModal({ isOpen, onClose, onSubmit, data }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,11 +14,26 @@ export function AddTenantModal({ isOpen, onClose, onSubmit }) {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        name: data.name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        plot_number: data.plot_number || '',
+        lease_start: data.lease_start || '',
+        lease_end: data.lease_end || '',
+        rent_amount: data.rent_amount || 0,
+        status: data.status || 'active',
+      });
+    }
+  }, [data]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsSubmitting(true); // Indicate submission in progress
     try {
       await onSubmit(formData);
       setFormData({
@@ -43,7 +58,9 @@ export function AddTenantModal({ isOpen, onClose, onSubmit }) {
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Add New Tenant</h2>
+          <h2 className="text-xl font-bold text-gray-900">{
+            data ? 'Edit' : 'Add'
+            } Tenant</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -137,9 +154,10 @@ export function AddTenantModal({ isOpen, onClose, onSubmit }) {
               </label>
               <input
                 type="number"
+                inputMode='decimal'
                 required
                 min="0"
-                step="0.01"
+                // step="0.01"
                 value={formData.rent_amount}
                 onChange={(e) => setFormData({ ...formData, rent_amount: parseFloat(e.target.value) })}
                 className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -174,7 +192,7 @@ export function AddTenantModal({ isOpen, onClose, onSubmit }) {
               disabled={isSubmitting}
               className="flex-1 cursor-pointer px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Adding...' : 'Add Tenant'}
+              {isSubmitting ? 'Adding...' : data ? 'Update Tenant' : 'Add Tenant'}
             </button>
           </div>
         </form>

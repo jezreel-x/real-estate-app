@@ -1,30 +1,126 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { TenantStatCard } from "@custom-components/TenantStatCard";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
-import { Users, FileText, DollarSign, TrendingUp, Plus, Search } from 'lucide-react';
+import { Users, FileText, DollarSign, TrendingUp, Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import Sidebar from "./Sidebar";
 import { AddInvoiceModal } from "@custom-components/AddInvoiceModal";
 import { AddTenantModal } from "@custom-components/AddTenantModal";
+import { notify } from "@custom-components/toastHelper";
+import Pagination from "@custom-components/Pagination";
+import isExpiringSoon from "@custom-components/isExpiringSoon";
 
 const User = () => {
     // Sample data - replace with actual data fetching logic
-    const [tenants, setTenants] = React.useState([]);
-    const [invoices, setInvoices] = React.useState([]);
+    const [tenants, setTenants] = React.useState(() => {
+        const storedTenants = localStorage.getItem('tenants');
+        return storedTenants ? JSON.parse(storedTenants) : [];
+    });
+    const [invoices, setInvoices] = React.useState(() => {
+        const storedInvoices = localStorage.getItem('invoices');
+        return storedInvoices ? JSON.parse(storedInvoices) : [];
+    });
+    const [expanded, setExpanded] = React.useState(true);
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = React.useState(5);
+    const [currentTenant, setCurrentTenant] = React.useState(null);
     const [activeTab, setActiveTab] = React.useState('tenants');
     const [showAddTenantModal, setShowAddTenantModal] = React.useState(false);
     const [showAddInvoiceModal, setShowAddInvoiceModal] = React.useState(false);
+    const [isExpiringSoonTenants, setIsExpiringSoonTenants] = React.useState(false);
 
     const activeTenants = tenants.filter((t) => t.status === 'active');
     const totalRent = activeTenants.reduce((sum, t) => sum + Number(t.rent_amount), 0);
-    const pendingInvoices = invoices.filter((i) => i.status === 'pending');
-    const paidInvoices = invoices.filter((i) => i.status === 'paid');
-    const pendingAmount = pendingInvoices.reduce((sum, i) => sum + Number(i.amount), 0);
+    // const pendingInvoices = invoices.filter((i) => i.status === 'pending');
+    // const paidInvoices = invoices.filter((i) => i.status === 'paid');
+    // const pendingAmount = pendingInvoices.reduce((sum, i) => sum + Number(i.amount), 0);
+    
+
+    // Persist tenants and invoices to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem('tenants', JSON.stringify(tenants));
+    }, [tenants]);
+
+    useEffect(() => {
+        localStorage.setItem('invoices', JSON.stringify(invoices));
+    }, [invoices]);
 
 
-    const handleAddTenant = async (tenantData) => {
+    // filter data by name, email or phone
+    const filterTenants = tenants.filter((tenant) => 
+    {
+        const query = searchQuery.trim().toLowerCase();
+        return (
+            tenant.name.toLowerCase().includes(query) || 
+            tenant.email.toLowerCase().includes(query) || 
+            tenant.phone.toLowerCase().includes(query)
+        );
+    });
+
+
+    // const itemsPerPage = 5;
+    const totalPages = Math.ceil(filterTenants.length / itemsPerPage);
+
+
+    // paginate filtered tenants
+    const paginatedTenants = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filterTenants.slice(startIndex, startIndex + itemsPerPage);
+    }, [filterTenants, currentPage, itemsPerPage]);
+
+
+    // page change handler
+    const handlePageChange = (page) => {
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+    };
+
+
+    // function to handle deleting a tenant with a custom toast notification
+    const handleDeleteTenant = (tenantId) => {
+        // Show confirmation toast
+        if (window.confirm("Are you sure you want to delete this tenant? This action cannot be undone.")) {
+            handleDeleteTenantConfirmed(tenantId);
+        }
+    };
+
+
+    // function that confirms deletion after user confirmation
+    const handleDeleteTenantConfirmed = (tenantId) => {
+
+        // toast notification asking for deletion confirmation
+        notify(`info`, `Deleting...`);
+
+        // Logic to delete tenant only after confirmation
+        setTimeout(() => {
+            const updatedTenants = tenants.filter((t) => t.id !== tenantId);
+            setTenants(updatedTenants);
+            localStorage.setItem('tenants', JSON.stringify(updatedTenants));
+            notify('success', 'Tenant deleted successfully.');
+        }, 3000); // Simulate delay for deletion
+
+    };
+
+
+    const handleAddEditTenant = async (tenantData) => {
         // Simulate API call
-        const newTenant = { id: Date.now(), ...tenantData };
-        setTenants((prev) => [...prev, newTenant]);
+        // const newTenant = { id: Date.now(), ...tenantData };
+        // setTenants((prev) => [...prev, newTenant]);
+        // localStorage.setItem('tenants', JSON.stringify(tenants));
+        if (currentTenant) {
+            // Edit existing tenant
+            const updatedTenant = { ...currentTenant, ...tenantData };
+            setTenants((prev) => prev.map((t) => (t.id === updatedTenant.id ? updatedTenant : t)));
+            localStorage.setItem('tenants', JSON.stringify(tenants));
+            notify('success', 'Tenant updated successfully.');
+            setCurrentTenant(null); // Clear current tenant after editing
+        } else {
+            // Add new tenant
+            const newTenant = { id: Date.now(), ...tenantData };
+            setTenants((prev) => [...prev, newTenant]);
+            localStorage.setItem('tenants', JSON.stringify(tenants));
+            notify('success', 'Tenant added successfully.');
+        }
     };
 
     const handleAddInvoice = async (invoiceData) => {
@@ -33,14 +129,38 @@ const User = () => {
         setInvoices((prev) => [...prev, newInvoice]);
     };
 
+
+    // functions to handle editing and deleting tenants and invoices
+    const handleEditTenant = (tenantData) => {
+        // Logic to edit tenant details
+
+        // You can pre-fill the modal form with tenant data here
+        setCurrentTenant(tenantData);
+
+        setShowAddTenantModal(true); // Open the modal for editing
+    };
+
+    const expiringSoonTenants = tenants.filter((tenant) => {
+        // isExpiringSoon(tenant.lease_end)
+        localStorage.setItem('tenants', JSON.stringify(tenants)); // Persist tenants to localStorage
+        return isExpiringSoon(tenant.lease_end);
+    });
+
+    const handleExpiringSoonTenantsVisibility = () => {
+        setIsExpiringSoonTenants(!isExpiringSoonTenants);
+    };
+
+    // console.log("Expiring Soon Tenants:", expiringSoonTenants.length);
+
     return (
         <>
             <div className="flex flex-col w-full bg-gray-100">
                 <PropertyManagerNavbar />
                 <div className="flex mt-20">
-                    <Sidebar />
-                    <div className="flex flex-1 max-w-[calc(100vw-16rem)] mx-auto flex-col min-h-screen">
-                        <div className="px-4 pt-4 pb-0">
+                    <Sidebar expanded={expanded} setExpanded={setExpanded} />
+                    <div className={`flex flex-1 flex-col min-h-screen
+                    transition-all duration-300 ease-in-out ${expanded ? "ml-64" : "ml-20"}`}>
+                        <div className="px-4 pt-4 pb-8 max-w-[calc(100vw-16rem)] mx-auto w-full">
                             <h1 className="text-2xl font-bold mb-4 text-gray-700">Tenants</h1>
 
                             {/* Users content goes here */}
@@ -55,19 +175,19 @@ const User = () => {
                                 />
                                 <TenantStatCard
                                     title="Monthly Revenue"
-                                    value={`$${totalRent.toLocaleString()}`}
+                                    value={`KES ${totalRent.toLocaleString()}`}
                                     icon={DollarSign}
                                     iconColor="text-emerald-600"
                                     iconBgColor="bg-emerald-100"
                                     subtitle="From active tenants"
                                 />
-                                <TenantStatCard
+                                {/* <TenantStatCard
                                     title="Pending Invoices"
                                     value={pendingInvoices.length}
                                     icon={FileText}
                                     iconColor="text-amber-600"
                                     iconBgColor="bg-amber-100"
-                                    subtitle={`$${pendingAmount.toLocaleString()} due`}
+                                    subtitle={`KES ${pendingAmount.toLocaleString()} due`}
                                 />
                                 <TenantStatCard
                                     title="Paid Invoices"
@@ -76,6 +196,15 @@ const User = () => {
                                     iconColor="text-emerald-600"
                                     iconBgColor="bg-emerald-100"
                                     subtitle="This period"
+                                /> */}
+                                <TenantStatCard
+                                    title="Leases Expiring Soon"
+                                    value={expiringSoonTenants.length}
+                                    icon={Users}
+                                    iconColor="text-red-600"
+                                    iconBgColor="bg-red-100"
+                                    subtitle="Within 30 days"
+                                    onClick={handleExpiringSoonTenantsVisibility}
                                 />
                             </div>
 
@@ -159,48 +288,138 @@ const User = () => {
                                                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
                                                 <input
                                                     type="text"
+                                                    value={searchQuery}
                                                     placeholder="Search tenants by name, email, or phone"
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 pl-10"
+                                                    className="w-[50%] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+                                                    text-gray-900 pl-10 transition-all duration-300"
+                                                    onChange={
+                                                        (e) => {
+                                                            setSearchQuery(e.target.value)
+                                                            setCurrentPage(1); // Reset to first page on new search
+                                                        }
+                                                    }
                                                     // Add onChange handler to update search state here
                                                 />
                                             </div>
 
-                                            {/* Tenant Table */}
-                                            <div className="overflow-x-auto">
-                                                <table className="min-w-full divide-y divide-gray-200">
-                                                    <thead className="bg-gray-50">
-                                                        <tr>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rent Amount</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="bg-white divide-y divide-gray-200">
-                                                        {tenants.map((tenant) => (
-                                                        <tr key={tenant.id} className="hover:bg-gray-50 cursor-pointer">
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tenant.name}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.email}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.phone}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${Number(tenant.rent_amount).toLocaleString()}</td>
-                                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${tenant.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
-                                                                    {tenant.status.charAt(0).toUpperCase() + tenant.status.slice(1)}
-                                                                </span>
-                                                            </td>
-                                                            {/* Actions column has edit/delete buttons */}
-                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                <button className="text-blue-600 hover:text-blue-900 mr-4">Edit</button>
-                                                                <button className="text-red-600 hover:text-red-900">Delete</button>
-                                                            </td>
-                                                        </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                                            <div>
+                                                {isExpiringSoonTenants ? (
+                                                    <div className="overflow-x-auto">
+                                                    <table className="min-w-full divide-y divide-gray-200">
+                                                        <thead className="bg-gray-50">
+                                                            <tr>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rent Amount</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="bg-white divide-y divide-gray-200">
+                                                            {expiringSoonTenants.map((tenant, index) => (
+                                                                <tr key={index} className="hover:bg-gray-50 cursor-pointer transition-all duration-300 animate-[fadeInUp_0.3s_ease-in-out]">
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tenant.name}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.email}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.phone}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">KES {Number(tenant.rent_amount).toLocaleString()}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${tenant.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                                            {tenant.status.charAt(0).toUpperCase() + tenant.status.slice(1)}
+                                                                        </span>
+                                                                    </td>
+                                                                    {/* Actions column has edit/delete buttons */}
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                        <button 
+                                                                            className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
+                                                                            onClick={() => handleEditTenant(tenant)}
+                                                                        >
+                                                                            {/* include an edit icon instead of text */}
+                                                                            <Pencil className="w-5 h-5" />
+                                                                        </button>
+                                                                        <button 
+                                                                            className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                                            onClick={() => handleDeleteTenant(tenant.id)}
+                                                                        >
+                                                                            {/* include a delete/trash icon instead of text */}
+                                                                            <Trash2 className="w-5 h-5" />
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                    </div>
+                                                ) : (
+                                                <div className="overflow-x-auto">
+                                                    <table className="min-w-full divide-y divide-gray-200">
+                                                        <thead className="bg-gray-50">
+                                                            <tr>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rent Amount</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="bg-white divide-y divide-gray-200">
+                                                            {paginatedTenants.map((tenant, index) => (
+                                                            <tr key={index} className="hover:bg-gray-50 cursor-pointer transition-all duration-300 animate-[fadeInUp_0.3s_ease-in-out]">
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tenant.name}</td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.email}</td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tenant.phone}</td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">KES {Number(tenant.rent_amount).toLocaleString()}</td>
+                                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${tenant.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                                        {tenant.status.charAt(0).toUpperCase() + tenant.status.slice(1)}
+                                                                    </span>
+                                                                </td>
+                                                                {/* Actions column has edit/delete buttons */}
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    <button 
+                                                                        className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
+                                                                        onClick={() => handleEditTenant(tenant)}
+                                                                    >
+                                                                        {/* include an edit icon instead of text */}
+                                                                        <Pencil className="w-5 h-5" />
+                                                                    </button>
+                                                                    <button 
+                                                                        className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                                        onClick={() => handleDeleteTenant(tenant.id)}
+                                                                    >
+                                                                        {/* include a delete/trash icon instead of text */}
+                                                                        <Trash2 className="w-5 h-5" />
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                )}
+                                                </div>
+
+                                                {/* If no tenants match the search query, show a message */}
+                                                {paginatedTenants.length === 0 && (
+                                                    <div className="text-center py-12">
+                                                        <h3 className="text-lg font-medium text-gray-900 mb-2">No tenants found</h3>
+                                                        <p className="text-gray-600">Try adjusting your search criteria.</p>
+                                                    </div>
+                                                )}
+
+
+                                                {/* Pagination Controls */}
+                                                <Pagination
+                                                    currentPage={currentPage}
+                                                    setCurrentPage={setCurrentPage}
+                                                    itemsPerPage={itemsPerPage}
+                                                    setItemsPerPage={setItemsPerPage}
+                                                    handlePageChange={handlePageChange}
+                                                    totalPages={totalPages}
+                                                />
+
                                             </div>
-                                        </div>
                                         )}
                                     </div>
                                     ) : (
@@ -212,7 +431,7 @@ const User = () => {
                                             <p className="text-gray-600 mb-4">Create your first invoice to start tracking payments</p>
                                             <button
                                             onClick={() => setShowAddInvoiceModal(true)}
-                                            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors"
                                             >
                                             <Plus className="w-5 h-5" />
                                             Create Invoice
@@ -220,7 +439,7 @@ const User = () => {
                                         </div>
                                         ) : (
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                            {invoicesWithTenants.map((invoice) => (
+                                            {invoices.map((invoice) => (
                                             <InvoiceCard key={invoice.id} invoice={invoice} onClick={() => {}} />
                                             ))}
                                         </div>
@@ -232,9 +451,10 @@ const User = () => {
                         </div>
 
                         <AddTenantModal
-                            isOpen={showAddTenantModal}
-                            onClose={() => setShowAddTenantModal(false)}
-                            onSubmit={handleAddTenant}
+                            isOpen={showAddTenantModal} // control modal visibility
+                            onClose={() => setShowAddTenantModal(false)} // function to close the modal
+                            onSubmit={handleAddEditTenant} // function to handle form submission
+                            data={currentTenant} // pass tenant data for editing
                         />
 
                         <AddInvoiceModal
@@ -249,5 +469,12 @@ const User = () => {
         </>
     );
 };
+
+// Persisting data across page reloads ***
+// Work on Edit and Delete functionalities later ***
+// Work on Invoices tab table later
+// Track leases expiring soon later
+// Work on search and pagination later ***
+// create a re-usable pagination component later ***
 
 export default User;

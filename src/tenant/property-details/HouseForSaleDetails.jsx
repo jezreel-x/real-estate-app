@@ -17,7 +17,7 @@ import { IoPersonOutline, IoVideocamOutline } from "react-icons/io5";
 import Navbar from "../landing-page/Navbar";
 import { toast } from "react-toastify";
 import Footer from "../landing-page/Footer";
-import useBreakpoint from "../custom-components/useBreakpoint";
+import useBreakpoint from "../../custom-components/useBreakpoint";
 
 const HouseForSaleDetails = () => {
 

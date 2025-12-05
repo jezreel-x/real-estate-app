@@ -3,41 +3,45 @@ import React, { useEffect, useState } from "react";
 import {
   Home,
   Users,
-  Anchor,
-  Building2,
+  ListPlus,
+  HandCoins,
   Package,
   FileText,
   ClipboardList,
   Wrench,
   Layers,
-  Briefcase,
-  Menu,
   Settings,
+  MapPinHouse,
+  Mail,
+  CircleDollarSign,
 } from "lucide-react";
+import { FcCustomerSupport } from "react-icons/fc";
 import { NavLink, useLocation } from "react-router-dom"; // optional, used if you have react-router
 
 const MENU = [
-  { id: "home", label: "Home", icon: Home},
+  { id: "home", label: "Home", icon: Home },
   { id: "dashboard", label: "Dashboard", icon: Home, to: "/property-manager/dashboard" },
   { id: "users", label: "Users", icon: Users, to: "/property-manager/users" },
-  { id: "roles", label: "Roles", icon: Anchor, to: "/roles" },
-  { id: "business", label: "Business Management", icon: Briefcase},
-//   { id: "property", label: "Property", icon: Building2, to: "/property" },
-  { id: "inquiries", label: "Inquiries", icon: Briefcase, to: "/inquiries" },
+  { id: "property", label: "Property", icon: MapPinHouse },
+  // { id: "roles", label: "Roles", icon: Anchor, to: "/roles" },
+  { id: "business", label: "Business Management", icon: HandCoins },
+  // { id: "property", label: "Property", icon: Building2, to: "/property" },
+  { id: "inquiries", label: "Inquiries", icon: Mail, to: "/inquiries" },
   { id: "tenant", label: "Tenant", icon: Package, to: "/tenant" },
   { id: "invoice", label: "Invoice", icon: FileText, to: "/invoice" },
-  { id: "expense", label: "Expense", icon: ClipboardList, to: "/expense" },
+  { id: "expense", label: "Expense", icon: CircleDollarSign, to: "/expense" },
   { id: "maintainer", label: "Maintainer", icon: Wrench, to: "/maintainer" },
-  { id: "requests", label: "Maintenance Request", icon: Layers, to: "/requests" },
-  { id: "additional", label: "Additional Options", icon: Layers },
+  { id: "requests", label: "Maintenance Requests", icon: Layers, to: "/requests" },
+  { id: "additional", label: "Additional Options", icon: ListPlus },
   { id: "reports", label: "Reports", icon: FileText, to: "/reports" },
-  { id: "support", label: "Support", icon: Users, to: "/support" },
+  { id: "support", label: "Support", icon: FcCustomerSupport, to: "/support" },
   { id: "notes", label: "Notes", icon: ClipboardList, to: "/notes" },
+  { id: "settings", label: "Settings", icon: Settings, to: "/settings" },
+  { id: "account", label: "Account", icon: Users, to: "/account" },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ expanded, setExpanded }) {
   // expanded on mount
-  const [expanded, setExpanded] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = typeof window !== "undefined" ? window.location.pathname : "/";
 
@@ -75,17 +79,18 @@ export default function Sidebar() {
         <aside
           // Responsive: hide or translate on small screens when mobileOpen=false
             className={`
-                fixed left-0 h-screen overflow-y-auto z-10 transform bg-[rgb(0,0,30)] text-amber-500 border-r border-slate-700
+                fixed left-0 top-20 h-[calc(100vh-5rem)] overflow-y-auto overflow-x-hidden z-10 transform bg-[rgb(0,0,30)] text-amber-500 border-r border-slate-700
                 transition-all duration-300 ease-in-out
                 ${expanded ? "w-64" : "w-20"}
-                md:static md:translate-x-0
+                md:translate-x-0
+                
             `}
             onMouseEnter={() => setExpanded(true)}
-            onMouseLeave={() => {
+            onMouseLeave={
                 // collapse only on desktop and when user didn't explicitly expand
                 // respects responsive collapseBelow prop via tailwind classes (see usage notes)
-                setExpanded(false);
-            }}
+                () => setExpanded(false)
+            }
         >
             {/* Logo area */}
             {/* <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-800">
@@ -118,23 +123,47 @@ export default function Sidebar() {
                     className={`
                     flex items-center gap-3 px-3 py-3 mx-2 rounded-md transition-colors duration-200
                     ${active ? "text-white" : "hover:bg-slate-800"}
-                    ${item.label === "Home" || item.label === "Business Management" || item.label === "Additional Options"
+                    ${item.label === "Home" || item.label === "Business Management" || 
+                      item.label === "Additional Options" || item.label === "Settings"
                          ? "text-amber-500 border-l-2 border-amber-500 pointer-events-none bg-slate-500" : ""}
                     `}
                     // aria-current={active ? "page" : undefined}
                 >
-                    <Icon 
-                        className={`w-5 h-5 flex-shrink-0 
-                            ${active ? "text-white" : "text-slate-300 group-hover:text-slate-100"}
-                            ${expanded ? "" : "mx-auto"}`
-                        } 
-                    />
-                    {/* label */}
-                    <span
-                        className={`text-sm font-medium transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-                    >
-                        {item.label}
-                    </span>
+                    {item.label === "Home" || item.label === "Business Management" || item.label === "Additional Options" || 
+                    item.label === "Settings" ? 
+                      (
+                      <>
+                        {/* icon */}
+                        {expanded === false ? (
+                          <Icon 
+                          className={`w-5 h-5 flex-shrink-0 
+                              ${active ? "text-white" : "text-slate-300 group-hover:text-slate-100"}
+                              ${expanded ? "" : "mx-auto"}`
+                          } 
+                          />
+                        ) : null}
+                        <span
+                            className={`text-sm font-medium transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                        >
+                            {item.label}
+                        </span>
+                      </>
+                      ) : (
+                      <>
+                        {/* icon */}
+                        <Icon 
+                          className={`w-5 h-5 flex-shrink-0 
+                              ${active ? "text-white" : "text-slate-300 group-hover:text-slate-100"}
+                              ${expanded ? "" : "mx-auto"}`
+                          } 
+                        />
+                        <span
+                            className={`text-sm font-medium transition-opacity duration-300 ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                        >
+                            {item.label}
+                        </span>
+                      </>
+                    )}
                 </a>
 
                 {/* Tooltip when collapsed */}
@@ -153,12 +182,14 @@ export default function Sidebar() {
         
 
             {/* Footer / small controls */}
-            <div className="mt-auto px-3 py-4 border-t border-slate-800">
+            {/* <div className="mt-auto px-3 py-4 border-t border-slate-800">
                 <div className={`flex items-center gap-3 px-2 py-2 rounded-md hover:bg-slate-800 cursor-pointer ${expanded ? "" : "justify-center"}`}>
-                    <Settings className="w-5 h-5" />
+                    <Settings className={`w-5 h-5 flex-shrink-0 
+                              ${active ? "text-white" : "text-slate-300 group-hover:text-slate-100"}
+                              ${expanded ? "" : "mx-auto"}`} />
                     <span className={`text-sm ${expanded ? "opacity-100" : "opacity-0 pointer-events-none"}`}>Settings</span>
                 </div>
-            </div>
+            </div> */}
         </aside>
 
         {/* Background overlay for mobile when sidebar open */}

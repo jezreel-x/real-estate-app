@@ -12,6 +12,9 @@ export const notify = (type, message) => {
         case 'info':
             toast.info(message, toastOptions.info);
             break;
+        case 'warning':
+            toast.warning(message, toastOptions.warning);
+            break;
         default:
             toast(message);
     }
