@@ -15,23 +15,23 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
     if (!isOpen) return null;
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // prevent default form submission
         setIsSubmitting(true);
         try {
-        await onSubmit(formData);
-        setFormData({
-            tenant_id: '',
-            invoice_number: '',
-            amount: 0,
-            due_date: '',
-            status: 'pending',
-            description: '',
-        });
-        onClose();
+            await onSubmit(formData);
+            setFormData({
+                tenant_id: '',
+                invoice_number: '',
+                amount: 0,
+                due_date: '',
+                status: 'pending',
+                description: '',
+            });
+            onClose();
         } catch (error) {
-        console.error('Error submitting form:', error);
+            console.error('Error submitting form:', error);
         } finally {
-        setIsSubmitting(false);
+            setIsSubmitting(false);
         }
     };
 

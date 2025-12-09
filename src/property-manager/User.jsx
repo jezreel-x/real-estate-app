@@ -24,6 +24,7 @@ const User = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const [itemsPerPage, setItemsPerPage] = React.useState(5);
     const [currentTenant, setCurrentTenant] = React.useState(null);
+    const [currentInvoice, setCurrentInvoice] = React.useState(null);
     const [activeTab, setActiveTab] = React.useState('tenants');
     const [showAddTenantModal, setShowAddTenantModal] = React.useState(false);
     const [showAddInvoiceModal, setShowAddInvoiceModal] = React.useState(false);
@@ -101,6 +102,25 @@ const User = () => {
 
     };
 
+    const handleDeleteInvoice = (invoiceId) => {
+        // Show confirmation toast
+        if (window.confirm("Are you sure you want to delete this invoice? This action cannot be undone.")) {
+            handleDeleteInvoiceConfirmed(invoiceId);
+        }
+    };
+
+    const handleDeleteInvoiceConfirmed = (invoiceId) => {
+        // toast notification asking for deletion confirmation
+        notify(`info`, `Deleting...`);
+
+        // Logic to delete invoice only after confirmation
+        setTimeout(() => {
+            const updatedInvoices = invoices.filter((i) => i.id !== invoiceId);
+            setInvoices(updatedInvoices);
+            localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+            notify('success', 'Invoice deleted successfully.');
+        }, 3000); // Simulate delay for deletion
+    };
 
     const handleAddEditTenant = async (tenantData) => {
         // Simulate API call
@@ -123,10 +143,25 @@ const User = () => {
         }
     };
 
-    const handleAddInvoice = async (invoiceData) => {
+    const handleAddEditInvoice = async (invoiceData) => {
         // Simulate API call
-        const newInvoice = { id: Date.now(), ...invoiceData };
-        setInvoices((prev) => [...prev, newInvoice]);
+        // const newInvoice = { id: Date.now(), ...invoiceData };
+        // setInvoices((prev) => [...prev, newInvoice]);
+
+        if (currentInvoice) {
+            // Edit existing invoice
+            const updatedInvoice = { ...currentInvoice, ...invoiceData };
+            setInvoices((prev) => prev.map((i) => (i.id === updatedInvoice.id ? updatedInvoice : i)));
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            notify('success', 'Invoice updated successfully.');
+            setCurrentInvoice(null); // Clear current invoice after editing
+        } else {
+            // Add new invoice
+            const newInvoice = { id: Date.now(), ...invoiceData };
+            setInvoices((prev) => [...prev, newInvoice]);
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+            notify('success', 'Invoice added successfully.');
+        }
     };
 
 
@@ -460,7 +495,7 @@ const User = () => {
                         <AddInvoiceModal
                             isOpen={showAddInvoiceModal}
                             onClose={() => setShowAddInvoiceModal(false)}
-                            onSubmit={handleAddInvoice}
+                            onSubmit={handleAddEditInvoice}
                             tenants={tenants}
                         />
                     </div>
