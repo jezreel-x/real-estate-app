@@ -78,7 +78,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                             required
                             value={formData.invoice_number}
                             onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-400"
                             placeholder="INV-001"
                         />
                     </div>
@@ -95,7 +95,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                             // step="0.01"
                             value={formData.amount}
                             onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-400"
                         />
                     </div>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { TenantStatCard } from "@custom-components/TenantStatCard";
+import { StatCard } from "@custom-components/StatCard";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import { Users, FileText, DollarSign, TrendingUp, Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import Sidebar from "./Sidebar";
@@ -165,7 +165,7 @@ const User = () => {
 
                             {/* Users content goes here */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                                <TenantStatCard
+                                <StatCard
                                     title="Total Tenants"
                                     value={tenants.length}
                                     icon={Users}
@@ -173,7 +173,7 @@ const User = () => {
                                     iconBgColor="bg-blue-100"
                                     subtitle={`${activeTenants.length} active`}
                                 />
-                                <TenantStatCard
+                                <StatCard
                                     title="Monthly Revenue"
                                     value={`KES ${totalRent.toLocaleString()}`}
                                     icon={DollarSign}
@@ -197,7 +197,7 @@ const User = () => {
                                     iconBgColor="bg-emerald-100"
                                     subtitle="This period"
                                 /> */}
-                                <TenantStatCard
+                                <StatCard
                                     title="Leases Expiring Soon"
                                     value={expiringSoonTenants.length}
                                     icon={Users}
@@ -473,7 +473,7 @@ const User = () => {
 // Persisting data across page reloads ***
 // Work on Edit and Delete functionalities later ***
 // Work on Invoices tab table later
-// Track leases expiring soon later
+// Track leases expiring soon later ***
 // Work on search and pagination later ***
 // create a re-usable pagination component later ***
 

@@ -1,5 +1,5 @@
 {/* StatCard.jsx */}
-export function TenantStatCard({ title, value, icon: Icon, iconColor, iconBgColor, subtitle, onClick }) {
+export function StatCard({ title, value, icon: Icon, iconColor, iconBgColor, subtitle, onClick }) {
   return (
     <div 
       className="bg-white rounded-lg shadow border border-gray-200 p-6 cursor-pointer hover:shadow-lg transition-shadow duration-300"
