@@ -21,7 +21,7 @@ import { NavLink, useLocation } from "react-router-dom"; // optional, used if yo
 const MENU = [
   { id: "home", label: "Home", icon: Home },
   { id: "dashboard", label: "Dashboard", icon: Home, to: "/property-manager/dashboard" },
-  { id: "users", label: "Users", icon: Users, to: "/property-manager/users" },
+  { id: "users", label: "Users", icon: Users, to: "/property-manager/tenants" },
   { id: "property", label: "Property", icon: MapPinHouse },
   // { id: "roles", label: "Roles", icon: Anchor, to: "/roles" },
   { id: "business", label: "Business Management", icon: HandCoins },

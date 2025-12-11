@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
+export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants, data }) {
     const [formData, setFormData] = useState({
         tenant_id: '',
         invoice_number: '',
@@ -11,6 +11,19 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
         description: '',
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (data) {
+            setFormData({
+                tenant_id: data.tenant_id || '',
+                invoice_number: data.invoice_number || '',
+                amount: data.amount || 0,
+                due_date: data.due_date || '',
+                status: data.status || 'pending',
+                description: data.description || '',
+            });
+        }
+    }, [data]);
 
     if (!isOpen) return null;
 
@@ -57,12 +70,20 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                         <select
                             required
                             value={formData.tenant_id}
-                            onChange={(e) => setFormData({ ...formData, tenant_id: e.target.value })}
+                            onChange={(e) => {
+                                const selectedTenant = tenants.find(t => t.id.toString() === e.target.value);
+                                if (!selectedTenant) return;
+                                setFormData({ 
+                                    ...formData, 
+                                    tenant_id: selectedTenant.id.toString(),
+                                    tenant_label: `${selectedTenant.name} - Plot ${selectedTenant.plot_number}`
+                                })
+                            }}
                             className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option className='text-gray-900' value="" disabled>Select a tenant</option>
                             {tenants.map((tenant) => (
-                            <option className='text-gray-900' key={tenant.id} value={tenant.id}>
+                            <option className='text-gray-900' key={tenant.id} value={tenant.id.toString()}>
                                 {tenant.name} - Plot {tenant.plot_number}
                             </option>
                             ))}
@@ -78,7 +99,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                             required
                             value={formData.invoice_number}
                             onChange={(e) => setFormData({ ...formData, invoice_number: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-400"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                             placeholder="INV-001"
                         />
                     </div>
@@ -150,7 +171,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 resize-none"
                         placeholder="Monthly rent payment, maintenance fee, etc."
                     />
                 </div>
@@ -168,7 +189,7 @@ export function AddInvoiceModal({ isOpen, onClose, onSubmit, tenants }) {
                         disabled={isSubmitting}
                         className="flex-1 cursor-pointer px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isSubmitting ? 'Creating...' : 'Create Invoice'}
+                        {isSubmitting ? 'Creating...' : data ? 'Update Invoice' : 'Create Invoice'}
                     </button>
                 </div>
             </form>

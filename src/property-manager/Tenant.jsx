@@ -9,16 +9,16 @@ import { notify } from "@custom-components/toastHelper";
 import Pagination from "@custom-components/Pagination";
 import isExpiringSoon from "@custom-components/isExpiringSoon";
 
-const User = () => {
+const Tenant = () => {
     // Sample data - replace with actual data fetching logic
     const [tenants, setTenants] = React.useState(() => {
         const storedTenants = localStorage.getItem('tenants');
         return storedTenants ? JSON.parse(storedTenants) : [];
     });
-    const [invoices, setInvoices] = React.useState(() => {
-        const storedInvoices = localStorage.getItem('invoices');
-        return storedInvoices ? JSON.parse(storedInvoices) : [];
-    });
+    // const [invoices, setInvoices] = React.useState(() => {
+    //     const storedInvoices = localStorage.getItem('invoices');
+    //     return storedInvoices ? JSON.parse(storedInvoices) : [];
+    // });
     const [expanded, setExpanded] = React.useState(true);
     const [searchQuery, setSearchQuery] = React.useState('');
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -42,9 +42,9 @@ const User = () => {
         localStorage.setItem('tenants', JSON.stringify(tenants));
     }, [tenants]);
 
-    useEffect(() => {
-        localStorage.setItem('invoices', JSON.stringify(invoices));
-    }, [invoices]);
+    // useEffect(() => {
+    //     localStorage.setItem('invoices', JSON.stringify(invoices));
+    // }, [invoices]);
 
 
     // filter data by name, email or phone
@@ -102,25 +102,25 @@ const User = () => {
 
     };
 
-    const handleDeleteInvoice = (invoiceId) => {
-        // Show confirmation toast
-        if (window.confirm("Are you sure you want to delete this invoice? This action cannot be undone.")) {
-            handleDeleteInvoiceConfirmed(invoiceId);
-        }
-    };
+    // const handleDeleteInvoice = (invoiceId) => {
+    //     // Show confirmation toast
+    //     if (window.confirm("Are you sure you want to delete this invoice? This action cannot be undone.")) {
+    //         handleDeleteInvoiceConfirmed(invoiceId);
+    //     }
+    // };
 
-    const handleDeleteInvoiceConfirmed = (invoiceId) => {
-        // toast notification asking for deletion confirmation
-        notify(`info`, `Deleting...`);
+    // const handleDeleteInvoiceConfirmed = (invoiceId) => {
+    //     // toast notification asking for deletion confirmation
+    //     notify(`info`, `Deleting...`);
 
-        // Logic to delete invoice only after confirmation
-        setTimeout(() => {
-            const updatedInvoices = invoices.filter((i) => i.id !== invoiceId);
-            setInvoices(updatedInvoices);
-            localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
-            notify('success', 'Invoice deleted successfully.');
-        }, 3000); // Simulate delay for deletion
-    };
+    //     // Logic to delete invoice only after confirmation
+    //     setTimeout(() => {
+    //         const updatedInvoices = invoices.filter((i) => i.id !== invoiceId);
+    //         setInvoices(updatedInvoices);
+    //         localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+    //         notify('success', 'Invoice deleted successfully.');
+    //     }, 3000); // Simulate delay for deletion
+    // };
 
     const handleAddEditTenant = async (tenantData) => {
         // Simulate API call
@@ -143,26 +143,26 @@ const User = () => {
         }
     };
 
-    const handleAddEditInvoice = async (invoiceData) => {
-        // Simulate API call
-        // const newInvoice = { id: Date.now(), ...invoiceData };
-        // setInvoices((prev) => [...prev, newInvoice]);
+    // const handleAddEditInvoice = async (invoiceData) => {
+    //     // Simulate API call
+    //     // const newInvoice = { id: Date.now(), ...invoiceData };
+    //     // setInvoices((prev) => [...prev, newInvoice]);
 
-        if (currentInvoice) {
-            // Edit existing invoice
-            const updatedInvoice = { ...currentInvoice, ...invoiceData };
-            setInvoices((prev) => prev.map((i) => (i.id === updatedInvoice.id ? updatedInvoice : i)));
-            localStorage.setItem('invoices', JSON.stringify(invoices));
-            notify('success', 'Invoice updated successfully.');
-            setCurrentInvoice(null); // Clear current invoice after editing
-        } else {
-            // Add new invoice
-            const newInvoice = { id: Date.now(), ...invoiceData };
-            setInvoices((prev) => [...prev, newInvoice]);
-            localStorage.setItem('invoices', JSON.stringify(invoices));
-            notify('success', 'Invoice added successfully.');
-        }
-    };
+    //     if (currentInvoice) {
+    //         // Edit existing invoice
+    //         const updatedInvoice = { ...currentInvoice, ...invoiceData };
+    //         setInvoices((prev) => prev.map((i) => (i.id === updatedInvoice.id ? updatedInvoice : i)));
+    //         localStorage.setItem('invoices', JSON.stringify(invoices));
+    //         notify('success', 'Invoice updated successfully.');
+    //         setCurrentInvoice(null); // Clear current invoice after editing
+    //     } else {
+    //         // Add new invoice
+    //         const newInvoice = { id: Date.now(), ...invoiceData };
+    //         setInvoices((prev) => [...prev, newInvoice]);
+    //         localStorage.setItem('invoices', JSON.stringify(invoices));
+    //         notify('success', 'Invoice added successfully.');
+    //     }
+    // };
 
 
     // functions to handle editing and deleting tenants and invoices
@@ -268,13 +268,11 @@ const User = () => {
                                             >
                                                 Invoices
                                             </button> */}
-                                            {[{label: 'Tenants', value: 'tenants'}, {label: 'Invoices', value: 'invoices'}].map((tab) => (
+                                            {[{label: 'Tenants', value: 'tenants'}].map((tab) => (
                                                 <button
                                                     key={tab.value}
-                                                    onClick={() => setActiveTab(tab.value)}
-                                                    className={`px-4 py-2 font-medium cursor-pointer rounded-lg transition-colors ${
-                                                        activeTab === tab.value ? 'bg-[rgb(0,0,30)] text-amber-500' : 'text-gray-600 hover:bg-gray-100'
-                                                    }`}
+                                                    // onClick={() => setActiveTab(tab.value)}
+                                                    className="px-4 py-2 font-medium cursor-pointer rounded-lg transition-colors bg-[rgb(0,0,30)] text-amber-500 hover:bg-slate-700 duration-300"
                                                 >
                                                     {tab.label}
                                                 </button>
@@ -282,18 +280,17 @@ const User = () => {
                                         </div>
                                         <button
                                             onClick={() =>
-                                                activeTab === 'tenants' ? setShowAddTenantModal(true) : setShowAddInvoiceModal(true)
+                                                setShowAddTenantModal(true)
                                             }
                                             className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
                                         >
                                             <Plus className="w-5 h-5 text-amber-500" />
-                                            <span className="text-amber-500">Add {activeTab === 'tenants' ? 'Tenant' : 'Invoice'}</span>
+                                            <span className="text-amber-500">Add Tenant</span>
                                         </button>
                                     </div>
                                 </div>
 
                                 <div className="p-6">
-                                    {activeTab === 'tenants' ? (
                                     <div>
                                         {tenants.length === 0 ? (
                                         <div className="text-center py-12">
@@ -457,30 +454,6 @@ const User = () => {
                                             </div>
                                         )}
                                     </div>
-                                    ) : (
-                                    <div>
-                                        {invoices.length === 0 ? (
-                                        <div className="text-center py-12">
-                                            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                            <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices yet</h3>
-                                            <p className="text-gray-600 mb-4">Create your first invoice to start tracking payments</p>
-                                            <button
-                                            onClick={() => setShowAddInvoiceModal(true)}
-                                            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors"
-                                            >
-                                            <Plus className="w-5 h-5" />
-                                            Create Invoice
-                                            </button>
-                                        </div>
-                                        ) : (
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                            {invoices.map((invoice) => (
-                                            <InvoiceCard key={invoice.id} invoice={invoice} onClick={() => {}} />
-                                            ))}
-                                        </div>
-                                        )}
-                                    </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
@@ -492,12 +465,12 @@ const User = () => {
                             data={currentTenant} // pass tenant data for editing
                         />
 
-                        <AddInvoiceModal
+                        {/* <AddInvoiceModal
                             isOpen={showAddInvoiceModal}
                             onClose={() => setShowAddInvoiceModal(false)}
                             onSubmit={handleAddEditInvoice}
                             tenants={tenants}
-                        />
+                        /> */}
                     </div>
                 </div>
             </div>
@@ -512,4 +485,4 @@ const User = () => {
 // Work on search and pagination later ***
 // create a re-usable pagination component later ***
 
-export default User;
+export default Tenant;
