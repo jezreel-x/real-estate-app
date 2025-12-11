@@ -1,6 +1,6 @@
 // OTPInput.jsx
 import React, { useRef, useState } from "react";
-import logo from '../assets/black.png';
+import logo from '../../assets/black.png';
 import { useNavigate, useLocation } from "react-router-dom";
 
 /**

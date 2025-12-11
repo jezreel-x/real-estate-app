@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { notify } from "@custom-components/toastHelper";
-import logo from '../assets/black.png';
+import logo from '../../assets/black.png';
 import { Mail, Phone } from 'lucide-react';
 
 const OTPDeliveryMethod = () => {
