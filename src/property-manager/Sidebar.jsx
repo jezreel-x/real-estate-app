@@ -28,7 +28,7 @@ const MENU = [
   // { id: "property", label: "Property", icon: Building2, to: "/property" },
   { id: "inquiries", label: "Inquiries", icon: Mail, to: "/inquiries" },
   { id: "tenant", label: "Tenant", icon: Package, to: "/property-manager/tenants" },
-  { id: "invoice", label: "Invoice", icon: FileText, to: "/property-manager/invoice" },
+  { id: "invoice", label: "Invoice", icon: FileText, to: "/property-manager/invoices" },
   { id: "expense", label: "Expense", icon: CircleDollarSign, to: "/expense" },
   { id: "maintainer", label: "Maintainer", icon: Wrench, to: "/maintainer" },
   { id: "requests", label: "Maintenance Requests", icon: Layers, to: "/requests" },

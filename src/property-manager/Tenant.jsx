@@ -130,8 +130,11 @@ const Tenant = () => {
         if (currentTenant) {
             // Edit existing tenant
             const updatedTenant = { ...currentTenant, ...tenantData };
-            setTenants((prev) => prev.map((t) => (t.id === updatedTenant.id ? updatedTenant : t)));
-            localStorage.setItem('tenants', JSON.stringify(tenants));
+            setTenants((prev) => {
+                const next = prev.map((t) => (t.id === updatedTenant.id ? updatedTenant : t));
+                localStorage.setItem('tenants', JSON.stringify(next)); // persist the actual updated array
+                return next;
+            });
             notify('success', 'Tenant updated successfully.');
             setCurrentTenant(null); // Clear current tenant after editing
         } else {
