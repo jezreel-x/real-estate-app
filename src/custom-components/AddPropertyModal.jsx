@@ -53,7 +53,7 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">{
             data ? 'Edit' : 'Add'
@@ -104,10 +104,10 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data }) {
                 onChange={(e) => setFormData({ ...formData, property_category: e.target.value })}
                 className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     {[
-                        { label: 'Apartments', value: 'apartments' }, 
-                        { label: "Houses", value: "houses" },
-                        { label: "Villas", value: "villas" },
-                        { label: "Mansions", value: "mansions" }
+                        { label: 'Apartments', value: 'Apartments' }, 
+                        { label: "Houses", value: "Houses" },
+                        { label: "Villas", value: "Villas" },
+                        { label: "Mansions", value: "Mansions" }
                     ].map((item) => (
                         <option key={item.value} value={item.value}>{item.label}</option>
                     ))}
@@ -144,20 +144,6 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description *
-              </label>
-              <textarea
-                type="text"
-                rows={6}
-                required
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Status *
               </label>
               <select
@@ -166,9 +152,23 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data }) {
                 className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="active">Active</option>
-                <option value="inactive">Under renovation</option>
+                <option value="under-renovation">Under renovation</option>
               </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description *
+            </label>
+            <textarea
+              type="text"
+              rows={6}
+              required
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            />
           </div>
 
           <div className="flex gap-3 pt-4">

@@ -1,21 +1,38 @@
-import React from "react";
-import { Building, Building2, Plus } from "lucide-react";
+import React, { useEffect, useMemo } from "react";
+import { Building, Building2, Plus, Search, Pencil, Trash2 } from "lucide-react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import { notify } from "@custom-components/toastHelper";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
+import Pagination from "@custom-components/Pagination";
+import { AddPropertyModal } from "@custom-components/AddPropertyModal";
+
 
 const Property = () => {
 
     const [expanded, setExpanded] = React.useState(true);
     const [properties, setProperties] = React.useState(() => {
         const storedProperties = localStorage.getItem('properties');
-        return storedProperties ? JSON.parse(storedProperties) : [];
+        return storedProperties ? JSON.parse(storedProperties) : []; 
+    });
+    const [units, setUnits] = React.useState(() => {
+        const storedUnits = localStorage.getItem('units');
+        return storedUnits ? JSON.parse(storedUnits) : []; 
     });
     const [currentProperty, setCurrentProperty] = React.useState(null);
     const [activeTab, setActiveTab] = React.useState('properties');
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = React.useState(5);
     const [showAddPropertyModal, setShowAddPropertyModal] = React.useState(false);
+    const [showAddUnitModal, setShowAddUnitModal] = React.useState(false);
+    const [selectedProperty, setSelectedProperty] = React.useState(null);
     const activeProperties = properties.filter((p) => p.status === 'active');
+
+    // persists data to local storage whenever they change
+    useEffect(() => {
+        localStorage.setItem('properties', JSON.stringify(properties))
+    }, [properties]);
 
     const handleAddEditProperty = async (propertyData) => {
 
@@ -37,6 +54,63 @@ const Property = () => {
             localStorage.setItem('properties', JSON.stringify(properties));
             notify('success', 'Property added successfully.');
         }
+
+    };
+
+    // handles editing of an existing property
+    const handleEditProperty = (propertyData) => {
+        // pre-fills the modal form with selected property data
+        setCurrentProperty(propertyData);
+
+        // then opens up the modal form
+        setShowAddPropertyModal(true);
+    };
+
+    // filter properties by property_name, property_type, or property_category
+    const filteredProperties = properties.filter((property) => {
+        const query = searchQuery.trim().toLowerCase();
+        return(
+            property.property_name.toLowerCase().includes(query) ||
+            property.property_type.toLowerCase().includes(query) ||
+            property.property_category.toLowerCase().includes(query)
+        );
+    });
+
+    const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+
+    // paginate filtered properties (basically, what property objects to display for that current page)
+    const paginatedProperties = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredProperties.slice(startIndex, startIndex + itemsPerPage)
+    }, [filteredProperties, itemsPerPage, currentPage]);
+
+    // handles page change
+    const handlePageChange = (page) => {
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+    };
+
+    // function to handle deleting a tenant with a custom toast notification
+    const handleDeleteProperty = (propertyId) => {
+        // Show confirmation toast
+        if (window.confirm("Are you sure you want to delete this property? This action cannot be undone.")) {
+            handleDeletePropertyConfirmed(propertyId);
+        }
+    };
+
+    // function that confirms deletion after user confirmation
+    const handleDeletePropertyConfirmed = (propertyId) => {
+
+        // toast notification asking for deletion confirmation
+        notify(`info`, `Deleting...`);
+
+        // Logic to delete tenant only after confirmation
+        setTimeout(() => {
+            const updatedProperties = properties.filter((p) => p.id !== propertyId);
+            setProperties(updatedProperties);
+            localStorage.setItem('properties', JSON.stringify(updatedProperties));
+            notify('success', 'Property deleted successfully.');
+        }, 3000); // Simulate delay for deletion
 
     };
     
@@ -102,36 +176,163 @@ const Property = () => {
                                             className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
                                         >
                                             <Plus className="w-5 h-5 text-amber-500" />
-                                                <span className="text-amber-500">Add {activeTab === "properties" ? "Property" : "Unit"}</span>
+                                            <span className="text-amber-500">Add {activeTab === "properties" ? "Property" : "Unit"}</span>
                                         </button>
                                     </div>
 
                                     <div className="p-6">
                                         <>
-                                            {activeTab === "properties" && properties.length === 0 ? (
-                                                <div className="text-center py-12">
-                                                    <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No properties yet</h3>
-                                                    <p className="text-gray-600 mb-4">Get started by adding your first property</p>
-                                                    <button
-                                                        onClick={() => setShowAddPropertyModal(true)}
-                                                        className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
-                                                    >
-                                                        <Plus className="w-5 h-5 text-amber-500" />
-                                                        <span className="text-amber-500">Add Property</span>
-                                                    </button>
-                                                </div>
-                                            ) : (
-                                                // new property table
-                                                // Include a search bar above the table to filter properties by property_name, property_type, or property_category 
+                                            {activeTab === "properties" ? (
+                                            // Properties section
+                                            <>
+                                                {properties.length === 0 ? (
+                                                    <div className="text-center py-12">
+                                                        <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                                        <h3 className="text-lg font-medium text-gray-900 mb-2">No properties yet</h3>
+                                                        <p className="text-gray-600 mb-4">Get started by adding your first property</p>
+                                                        <button
+                                                            onClick={() => setShowAddPropertyModal(true)}
+                                                            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
+                                                        >
+                                                            <Plus className="w-5 h-5 text-amber-500" />
+                                                            <span className="text-amber-500">Add Property</span>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    // new property table
+                                                    // Include a search bar above the table to filter properties by property_name, property_type, or property_category 
 
-                                                <div></div>
+                                                    <div>
+                                                        <div className="mb-4 relative">
+                                                            {/* Add an icon inside the search input if desired */}
+                                                            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                                                            <input
+                                                                type="text"
+                                                                value={searchQuery}
+                                                                placeholder="Search properties by property name, property type, or property category"
+                                                                className="w-[50%] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+                                                                text-gray-900 pl-10 transition-all duration-300"
+                                                                onChange={
+                                                                    (e) => {
+                                                                        setSearchQuery(e.target.value)
+                                                                        setCurrentPage(1); // Reset to first page on new search
+                                                                    }
+                                                                }
+                                                                // Add onChange handler to update search state here
+                                                            />
+                                                        </div>
+
+                                                        <div>
+                                                            <div className="overflow-x-auto">
+                                                                <table className="min-w-full divide-y divide-gray-200">
+                                                                    <thead className="bg-gray-50">
+                                                                        <tr>
+                                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property Name</th>
+                                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property Type</th>
+                                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property Category</th>
+                                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Units</th>
+                                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody className="bg-white divide-y divide-gray-200">
+                                                                        {paginatedProperties.map((property, index) => (
+                                                                        <tr 
+                                                                            key={index} 
+                                                                            className="hover:bg-gray-50 cursor-pointer transition-all duration-300 animate-[fadeInUp_0.3s_ease-in-out]"
+                                                                            onClick={
+                                                                                () => {
+                                                                                    setActiveTab("units")
+                                                                                    setSelectedProperty(property)
+                                                                                }
+                                                                            }
+                                                                        >
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{property.property_name}</td>
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.property_type}</td>
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.property_category}</td>
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.total_units}</td>
+                                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${property.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                                                    {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
+                                                                                </span>
+                                                                            </td>
+                                                                            {/* Actions column has edit/delete buttons */}
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                                <button 
+                                                                                    className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
+                                                                                    onClick={() => handleEditProperty(property)}
+                                                                                >
+                                                                                    {/* include an edit icon instead of text */}
+                                                                                    <Pencil className="w-5 h-5" />
+                                                                                </button>
+                                                                                <button 
+                                                                                    className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                                                    onClick={() => handleDeleteProperty(property.id)}
+                                                                                >
+                                                                                    {/* include a delete/trash icon instead of text */}
+                                                                                    <Trash2 className="w-5 h-5" />
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                        ))}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+
+                                                            {/* If no properties match the search query, show a message */}
+                                                            {paginatedProperties.length === 0 && (
+                                                                <div className="text-center py-12">
+                                                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No properties found</h3>
+                                                                    <p className="text-gray-600">Try adjusting your search criteria.</p>
+                                                                </div>
+                                                            )}
+
+
+                                                            {/* Pagination Controls */}
+                                                            <Pagination
+                                                                currentPage={currentPage}
+                                                                setCurrentPage={setCurrentPage}
+                                                                itemsPerPage={itemsPerPage}
+                                                                setItemsPerPage={setItemsPerPage}
+                                                                handlePageChange={handlePageChange}
+                                                                totalPages={totalPages}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </>
+                                            ) : (
+                                            <>
+                                                {units.length === 0 ? (
+                                                    <div className="text-center py-12">
+                                                        <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                                        <h3 className="text-lg font-medium text-gray-900 mb-2">No units yet</h3>
+                                                        <p className="text-gray-600 mb-4">Get started by adding your first unit</p>
+                                                        <button
+                                                            onClick={() => setShowAddUnitModal(true)}
+                                                            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
+                                                        >
+                                                            <Plus className="w-5 h-5 text-amber-500" />
+                                                            <span className="text-amber-500">Add Unit</span>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-slate-900">Units created</div>
+                                                )}
+                                            </>
                                             )}
                                         </>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <AddPropertyModal
+                            isOpen={showAddPropertyModal} // control modal visibility
+                            onClose={() => setShowAddPropertyModal(false)} // function to close the modal
+                            onSubmit={handleAddEditProperty} // function to handle form submission
+                            data={currentProperty} // pass tenant data for editing
+                        />
                     </main>
                 </div>
             </div>
