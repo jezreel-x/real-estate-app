@@ -1,8 +1,9 @@
 import React from "react";
-import { Building, Building2 } from "lucide-react";
+import { Building, Building2, Plus } from "lucide-react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import { notify } from "@custom-components/toastHelper";
 import Sidebar from "./Sidebar";
+import { StatCard } from "@custom-components/StatCard";
 
 const Property = () => {
 
@@ -13,6 +14,7 @@ const Property = () => {
     });
     const [currentProperty, setCurrentProperty] = React.useState(null);
     const [activeTab, setActiveTab] = React.useState('properties');
+    const [showAddPropertyModal, setShowAddPropertyModal] = React.useState(false);
     const activeProperties = properties.filter((p) => p.status === 'active');
 
     const handleAddEditProperty = async (propertyData) => {
@@ -82,16 +84,50 @@ const Property = () => {
                                 <div className="border-b border-gray-200">
                                     <div className="flex items-center justify-between px-6 py-4">
                                         <div className="flex gap-4">
-                                            {[{label: 'Properties', value: 'properties'}].map((tab) => (
+                                            {[{ label: 'Properties', value: 'properties' }, { label: "Units", value: "units" }].map((tab) => (
                                                 <button
                                                     key={tab.value}
                                                     onClick={() => setActiveTab(tab.value)}
-                                                    className="px-4 py-2 font-medium cursor-pointer rounded-lg transition-colors bg-[rgb(0,0,30)] text-amber-500 hover:bg-slate-700 duration-300"
+                                                    className={`px-4 py-2 font-medium cursor-pointer rounded-lg transition-colors duration-300
+                                                        ${activeTab === tab.value ? "bg-[rgb(0,0,30)] text-amber-500" : "bg-slate-200 hover:bg-slate-300 text-slate-700"}`}
                                                 >
                                                     {tab.label}
                                                 </button>
                                             ))}
                                         </div>
+                                        <button
+                                            onClick={() =>
+                                                setShowAddPropertyModal(true)
+                                            }
+                                            className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
+                                        >
+                                            <Plus className="w-5 h-5 text-amber-500" />
+                                                <span className="text-amber-500">Add {activeTab === "properties" ? "Property" : "Unit"}</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="p-6">
+                                        <>
+                                            {activeTab === "properties" && properties.length === 0 ? (
+                                                <div className="text-center py-12">
+                                                    <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No properties yet</h3>
+                                                    <p className="text-gray-600 mb-4">Get started by adding your first property</p>
+                                                    <button
+                                                        onClick={() => setShowAddPropertyModal(true)}
+                                                        className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
+                                                    >
+                                                        <Plus className="w-5 h-5 text-amber-500" />
+                                                        <span className="text-amber-500">Add Property</span>
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                // new property table
+                                                // Include a search bar above the table to filter properties by property_name, property_type, or property_category 
+
+                                                <div></div>
+                                            )}
+                                        </>
                                     </div>
                                 </div>
                             </div>

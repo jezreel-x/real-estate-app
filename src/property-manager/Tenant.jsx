@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo } from "react";
 import { StatCard } from "@custom-components/StatCard";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
-import { Users, FileText, DollarSign, TrendingUp, Plus, Search, Pencil, Trash2 } from 'lucide-react';
+import { Users, DollarSign, Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import Sidebar from "./Sidebar";
-import { AddInvoiceModal } from "@custom-components/AddInvoiceModal";
+// import { AddInvoiceModal } from "@custom-components/AddInvoiceModal";
 import { AddTenantModal } from "@custom-components/AddTenantModal";
 import { notify } from "@custom-components/toastHelper";
 import Pagination from "@custom-components/Pagination";
