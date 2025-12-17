@@ -29,7 +29,10 @@ const Property = () => {
     const [showAddPropertyModal, setShowAddPropertyModal] = React.useState(false);
     const [showAddUnitModal, setShowAddUnitModal] = React.useState(false);
     const [selectedProperty, setSelectedProperty] = React.useState(null);
+
     const activeProperties = properties.filter((p) => p.status === 'active');
+    const occupiedUnits = units.filter((u) => u.status === "Occupied");
+    const vacantUnits = units.filter((u) => u.status === "Vacant");
 
     // persists property data to local storage whenever they change
     useEffect(() => {
@@ -81,7 +84,11 @@ const Property = () => {
             setCurrentUnit(null); // clear current unit after editing
         } else {
             // add a unit
-            const newUnit = { id: crypto.randomUUID(), ...unitData };
+            const newUnit = { 
+                id: crypto.randomUUID(),
+                property_id: selectedProperty.id,  // Link unit to property 
+                ...unitData 
+            };
             setUnits((prev) => [...prev, newUnit]);
             localStorage.setItem('units', JSON.stringify(units));
             notify('success', 'Unit added successfully.');
@@ -169,7 +176,7 @@ const Property = () => {
                                 />
                                 <StatCard
                                     title="Occupied units"
-                                    value={0}
+                                    value={occupiedUnits.length}
                                     icon={Building2}
                                     iconColor="text-emerald-600"
                                     iconBgColor="bg-emerald-100"
@@ -177,7 +184,7 @@ const Property = () => {
                                 />
                                 <StatCard
                                     title="Vacant units"
-                                    value={0}
+                                    value={vacantUnits.length}
                                     icon={Building2}
                                     iconColor="text-amber-600"
                                     iconBgColor="bg-amber-100"
@@ -190,16 +197,31 @@ const Property = () => {
                                 <div className="border-b border-gray-200">
                                     <div className="flex items-center justify-between px-6 py-4">
                                         <div className="flex gap-4">
-                                            {[{ label: 'Properties', value: 'properties' }, { label: "Units", value: "units" }].map((tab) => (
-                                                <button
+                                            {[{ label: 'Properties', value: 'properties' }, { label: "Units", value: "units" }].map((tab) => {
+                                                const isUnitsTab = tab.value === 'units';
+                                                const isDisabled = isUnitsTab && properties.length === 0;
+
+                                                return (
+                                                    <button
                                                     key={tab.value}
-                                                    onClick={() => setActiveTab(tab.value)}
-                                                    className={`px-4 py-2 font-medium cursor-pointer rounded-lg transition-colors duration-300
-                                                        ${activeTab === tab.value ? "bg-[rgb(0,0,30)] text-amber-500" : "bg-slate-200 hover:bg-slate-300 text-slate-700"}`}
-                                                >
+                                                    onClick={() => {
+                                                        if (!isDisabled) {
+                                                            setActiveTab(tab.value);
+                                                        }
+                                                    }}
+                                                    disabled={tab.value === "units"}
+                                                    className={`px-4 py-2 font-medium rounded-lg transition-colors duration-300
+                                                        ${isDisabled 
+                                                        ? "bg-gray-500 text-gray-900 cursor-not-allowed opacity-50" 
+                                                        : activeTab === tab.value 
+                                                            ? "bg-[rgb(0,0,30)] text-amber-500 cursor-pointer" 
+                                                            : "bg-slate-200 hover:bg-slate-300 text-slate-700 cursor-pointer"
+                                                    }`}
+                                                    >
                                                     {tab.label}
-                                                </button>
-                                            ))}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                         <button
                                             onClick={() => {
@@ -282,14 +304,14 @@ const Property = () => {
                                                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{property.property_name}</td>
                                                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.property_type}</td>
                                                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.property_category}</td>
-                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{property.total_units}</td>
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{units.filter((u) => u.property_id === property.id).length}</td>
                                                                             <td className="px-6 py-4 whitespace-nowrap">
                                                                                 <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${property.status === 'active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'}`}>
                                                                                     {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
                                                                                 </span>
                                                                             </td>
                                                                             {/* Actions column has edit/delete buttons */}
-                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                            <td className="flex items-center justify-around py-4 whitespace-nowrap text-sm text-gray-500">
                                                                                 <button 
                                                                                     className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
                                                                                     onClick={(e) => {
@@ -309,6 +331,18 @@ const Property = () => {
                                                                                 >
                                                                                     {/* include a delete/trash icon instead of text */}
                                                                                     <Trash2 className="w-5 h-5" />
+                                                                                </button>
+                                                                                <button 
+                                                                                    className="bg-[rgb(0,0,30)] transition-opacity duration-300 hover:opacity-75 text-amber-500 cursor-pointer rounded-lg px-4 py-2"
+                                                                                    onClick={() => {
+                                                                                        // e.stopPropagation();
+                                                                                        setActiveTab("units")
+                                                                                        setSelectedProperty(property)
+                                                                                    }
+                                                                                    }
+                                                                                >
+                                                                                    {/* include a `View Units` text */}
+                                                                                    View Units
                                                                                 </button>
                                                                             </td>
                                                                         </tr>
@@ -378,15 +412,15 @@ const Property = () => {
                             isOpen={showAddPropertyModal} // control modal visibility
                             onClose={() => setShowAddPropertyModal(false)} // function to close the modal
                             onSubmit={handleAddEditProperty} // function to handle form submission
-                            data={currentProperty} // pass tenant data for editing
-                            units={units}
+                            data={currentProperty} // pass property data for editing
+                            units={currentProperty ? units.filter((u) => u.property_id === currentProperty.id) : []}
                         />
 
                         <AddUnitModal
                             isOpen={showAddUnitModal} // control modal visibility
                             onClose={() => setShowAddUnitModal(false)} // function to close the modal
                             onSubmit={handleAddEditUnit} // function to handle form submission
-                            data={currentUnit} // pass tenant data for editing
+                            data={currentUnit} // pass unit data for editing
                         />
                     </main>
                 </div>

@@ -208,7 +208,7 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
                     disabled={isSubmitting}
                     className="flex-1 cursor-pointer px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isSubmitting ? 'Adding...' : data ? 'Update Property' : 'Add Property'}
+                    {isSubmitting ? 'Adding...' : data ? 'Update Unit' : 'Add Unit'}
                 </button>
             </div>
         </form>

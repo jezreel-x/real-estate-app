@@ -15,17 +15,19 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data, units }) {
 
   useEffect(() => {
     if (data) {
+      // Filter units that belong to this property
+      const propertyUnits = units.filter((u) => u.property_id === data.id);
       setFormData({
         property_name: data.property_name || '',
         property_type: data.property_type || 'Rentals',
         property_category: data.property_category || 'Apartments',
-        total_units: data.total_units || '',
+        total_units: propertyUnits.length,  // Count units for THIS property
         location: data.location || '',
         description: data.description || '',
         status: data.status || 'active',
       });
     }
-  }, [data]);
+  }, [data, units]);
 
   if (!isOpen) return null;
 
