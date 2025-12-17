@@ -221,7 +221,7 @@ const Property = () => {
                                                     <div className="text-center py-12">
                                                         <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                                                         <h3 className="text-lg font-medium text-gray-900 mb-2">No properties yet</h3>
-                                                        <p className="text-gray-600 mb-4">Get started by adding your first property</p>
+                                                        <p className="text-gray-600 mb-4">Get started by adding your first property, afterwards, create units for your properties</p>
                                                         <button
                                                             onClick={() => setShowAddPropertyModal(true)}
                                                             className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
