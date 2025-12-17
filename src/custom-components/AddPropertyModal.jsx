@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
-export function AddPropertyModal({ isOpen, onClose, onSubmit, data }) {
+export function AddPropertyModal({ isOpen, onClose, onSubmit, data, units }) {
   const [formData, setFormData] = useState({
     property_name: '',
     property_type: 'Rentals',
     property_category: 'Apartments',
-    total_units: 0,
+    total_units: units.length,
     location: '',
     description: '',
     status: 'active',

@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
 import Pagination from "@custom-components/Pagination";
 import { AddPropertyModal } from "@custom-components/AddPropertyModal";
+import { AddUnitModal } from "../custom-components/AddUnitModal";
 
 
 const Property = () => {
@@ -20,6 +21,7 @@ const Property = () => {
         return storedUnits ? JSON.parse(storedUnits) : []; 
     });
     const [currentProperty, setCurrentProperty] = React.useState(null);
+    const [currentUnit, setCurrentUnit] = React.useState(null);
     const [activeTab, setActiveTab] = React.useState('properties');
     const [searchQuery, setSearchQuery] = React.useState('');
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -29,11 +31,17 @@ const Property = () => {
     const [selectedProperty, setSelectedProperty] = React.useState(null);
     const activeProperties = properties.filter((p) => p.status === 'active');
 
-    // persists data to local storage whenever they change
+    // persists property data to local storage whenever they change
     useEffect(() => {
         localStorage.setItem('properties', JSON.stringify(properties))
     }, [properties]);
 
+    // persists unit data to local storage whenever they change
+    useEffect(() => {
+        localStorage.setItem('units', JSON.stringify(units))
+    }, [units]);
+
+    // handles adding or editing mode of an existing property
     const handleAddEditProperty = async (propertyData) => {
 
         if (currentProperty) {
@@ -56,6 +64,30 @@ const Property = () => {
         }
 
     };
+
+    // handles adding or editing mode of an existing unit
+    const handleAddEditUnit = async (unitData) => {
+
+        if (currentUnit) {
+            // edit a property
+            const updatedUnit = {...currentUnit, ...unitData};
+            setUnits(
+            (prev) => {
+                const next = prev.map((u) => (u.id === updatedUnit.id ? updatedUnit : u));
+                localStorage.setItem('units', JSON.stringify(next));
+                return next;
+            });
+            notify('success', 'Unit updated successfully.');
+            setCurrentUnit(null); // clear current unit after editing
+        } else {
+            // add a unit
+            const newUnit = { id: crypto.randomUUID(), ...unitData };
+            setUnits((prev) => [...prev, newUnit]);
+            localStorage.setItem('units', JSON.stringify(units));
+            notify('success', 'Unit added successfully.');
+        }
+
+    }; 
 
     // handles editing of an existing property
     const handleEditProperty = (propertyData) => {
@@ -170,9 +202,9 @@ const Property = () => {
                                             ))}
                                         </div>
                                         <button
-                                            onClick={() =>
-                                                setShowAddPropertyModal(true)
-                                            }
+                                            onClick={() => {
+                                                activeTab === "properties" ? setShowAddPropertyModal(true) : setShowAddUnitModal(true)
+                                            }}
                                             className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
                                         >
                                             <Plus className="w-5 h-5 text-amber-500" />
@@ -260,14 +292,20 @@ const Property = () => {
                                                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                                 <button 
                                                                                     className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
-                                                                                    onClick={() => handleEditProperty(property)}
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleEditProperty(property);
+                                                                                    }}
                                                                                 >
                                                                                     {/* include an edit icon instead of text */}
                                                                                     <Pencil className="w-5 h-5" />
                                                                                 </button>
                                                                                 <button 
                                                                                     className="text-red-600 hover:text-red-900 cursor-pointer"
-                                                                                    onClick={() => handleDeleteProperty(property.id)}
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleDeleteProperty(property.id);
+                                                                                    }}
                                                                                 >
                                                                                     {/* include a delete/trash icon instead of text */}
                                                                                     <Trash2 className="w-5 h-5" />
@@ -303,21 +341,30 @@ const Property = () => {
                                             </>
                                             ) : (
                                             <>
-                                                {units.length === 0 ? (
-                                                    <div className="text-center py-12">
-                                                        <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                                        <h3 className="text-lg font-medium text-gray-900 mb-2">No units yet</h3>
-                                                        <p className="text-gray-600 mb-4">Get started by adding your first unit</p>
-                                                        <button
-                                                            onClick={() => setShowAddUnitModal(true)}
-                                                            className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
-                                                        >
-                                                            <Plus className="w-5 h-5 text-amber-500" />
-                                                            <span className="text-amber-500">Add Unit</span>
-                                                        </button>
+                                                {selectedProperty && (
+                                                    <div className="space-y-4">
+                                                        <h2 className="text-xl font-semibold text-slate-800">
+                                                            Units – {selectedProperty.property_name}
+                                                        </h2>
+                                                        {selectedProperty.total_units === 0 ? (
+                                                            <div className="text-center py-12">
+                                                                <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                                                <h3 className="text-lg font-medium text-gray-900 mb-2">No units yet</h3>
+                                                                <p className="text-gray-600 mb-4">Get started by adding your first unit</p>
+                                                                <button
+                                                                    onClick={() => setShowAddUnitModal(true)}
+                                                                    className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
+                                                                >
+                                                                    <Plus className="w-5 h-5 text-amber-500" />
+                                                                    <span className="text-amber-500">Add Unit</span>
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                                                Almost there...
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                ) : (
-                                                    <div className="text-slate-900">Units created</div>
                                                 )}
                                             </>
                                             )}
@@ -332,6 +379,14 @@ const Property = () => {
                             onClose={() => setShowAddPropertyModal(false)} // function to close the modal
                             onSubmit={handleAddEditProperty} // function to handle form submission
                             data={currentProperty} // pass tenant data for editing
+                            units={units}
+                        />
+
+                        <AddUnitModal
+                            isOpen={showAddUnitModal} // control modal visibility
+                            onClose={() => setShowAddUnitModal(false)} // function to close the modal
+                            onSubmit={handleAddEditUnit} // function to handle form submission
+                            data={currentUnit} // pass tenant data for editing
                         />
                     </main>
                 </div>
