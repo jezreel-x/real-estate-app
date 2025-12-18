@@ -114,7 +114,7 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
                         required
                         min="0"
                         value={formData.rent}
-                        onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, rent: parseInt(e.target.value) })}
                         className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>

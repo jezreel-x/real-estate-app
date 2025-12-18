@@ -26,8 +26,19 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data, units }) {
         description: data.description || '',
         status: data.status || 'active',
       });
+    } else if (isOpen && !data) {
+      // Reset form for new property
+      setFormData({
+        property_name: '',
+        property_type: 'Rentals',
+        property_category: 'Apartments',
+        total_units: units.length,
+        location: '',
+        description: '',
+        status: 'active',
+      });
     }
-  }, [data, units]);
+  }, [isOpen, data, units]);
 
   if (!isOpen) return null;
 
@@ -40,7 +51,7 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data, units }) {
         property_name: '',
         property_type: 'Rentals',
         property_category: 'Apartments',
-        total_units: '',
+        total_units: units.length,
         location: '',
         description: '',
         status: 'active',

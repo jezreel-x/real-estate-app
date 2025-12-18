@@ -225,7 +225,12 @@ const Property = () => {
                                         </div>
                                         <button
                                             onClick={() => {
-                                                activeTab === "properties" ? setShowAddPropertyModal(true) : setShowAddUnitModal(true)
+                                                if (activeTab === "properties") {
+                                                    setCurrentProperty(null);
+                                                    setShowAddPropertyModal(true);
+                                                } else {
+                                                    setShowAddUnitModal(true);
+                                                }
                                             }}
                                             className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
                                         >
@@ -245,7 +250,10 @@ const Property = () => {
                                                         <h3 className="text-lg font-medium text-gray-900 mb-2">No properties yet</h3>
                                                         <p className="text-gray-600 mb-4">Get started by adding your first property, afterwards, create units for your properties</p>
                                                         <button
-                                                            onClick={() => setShowAddPropertyModal(true)}
+                                                            onClick={() => {
+                                                                setCurrentProperty(null);
+                                                                setShowAddPropertyModal(true);
+                                                            }}
                                                             className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-white rounded-lg hover:bg-slate-700 transition-colors"
                                                         >
                                                             <Plus className="w-5 h-5 text-amber-500" />
@@ -410,10 +418,12 @@ const Property = () => {
 
                         <AddPropertyModal
                             isOpen={showAddPropertyModal} // control modal visibility
-                            onClose={() => setShowAddPropertyModal(false)} // function to close the modal
+                            onClose={() => {
+                                setShowAddPropertyModal(false)
+                            }} // function to close the modal
                             onSubmit={handleAddEditProperty} // function to handle form submission
                             data={currentProperty} // pass property data for editing
-                            units={currentProperty ? units.filter((u) => u.property_id === currentProperty.id) : []}
+                            units={selectedProperty ? units.filter((u) => u.property_id === selectedProperty.id) : []}
                         />
 
                         <AddUnitModal
