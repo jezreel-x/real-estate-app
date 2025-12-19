@@ -1,5 +1,10 @@
 import React, { useEffect, useMemo } from "react";
-import { Building, Building2, Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination as CarouselPagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Building, Building2, Plus, Search, Pencil, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import { notify } from "@custom-components/toastHelper";
 import Sidebar from "./Sidebar";
@@ -388,7 +393,7 @@ const Property = () => {
                                                         <h2 className="text-xl font-semibold text-slate-800">
                                                             Units – {selectedProperty.property_name}
                                                         </h2>
-                                                        {selectedProperty.total_units === 0 ? (
+                                                        {units.filter((u) => u.property_id === selectedProperty.id).length === 0 ? (
                                                             <div className="text-center py-12">
                                                                 <Building2 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                                                                 <h3 className="text-lg font-medium text-gray-900 mb-2">No units yet</h3>
@@ -403,7 +408,68 @@ const Property = () => {
                                                             </div>
                                                         ) : (
                                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                                                Almost there...
+                                                                {units.filter((u) => u.property_id === selectedProperty.id).map((u) => (
+                                                                    <div key={u.id} className="relative bg-white rounded-xl shadow overflow-hidden hover:shadow-lg hover:cursor-pointer hover:scale-[1.02] hover:transition duration-300 ease-in-out space-y-2">
+                                                                        {u.images.length > 0 ? (
+                                                                            <>
+                                                                                {/* Custom Navigation Buttons */}
+                                                                                <div className={`absolute top-1/4 left-2 z-10 -translate-y-1/2 cursor-pointer swiper-button-prev-${u.id} bg-black/50 p-2 rounded-full text-white hover:bg-black/70`}>
+                                                                                    <ChevronLeft size={20} />
+                                                                                </div>
+                                                                                <div className={`absolute top-1/4 right-2 z-10 -translate-y-1/2 cursor-pointer swiper-button-next-${u.id} bg-black/50 p-2 rounded-full text-white hover:bg-black/70`}>
+                                                                                    <ChevronRight size={20} />
+                                                                                </div>
+                                                                                {/* Image Carousel */}
+                                                                                <Swiper 
+                                                                                    spaceBetween={10} 
+                                                                                    slidesPerView={1} 
+                                                                                    loop={true}
+                                                                                    navigation={{
+                                                                                        nextEl: `.swiper-button-next-${u.id}`,
+                                                                                        prevEl: `.swiper-button-prev-${u.id}`,
+                                                                                    }}
+                                                                                    pagination={{
+                                                                                        // el: `.swiper-pagination-${u.id}`,
+                                                                                        clickable: true,
+                                                                                        renderBullet: (index, className) => {
+                                                                                        return `
+                                                                                            <span class="${className} bg-black/50 p-1 rounded-full hover:bg-black/70">
+                                                                                            <span class="block w-2.5 h-2.5 rounded-full bg-gray-400"></span>
+                                                                                            </span>`;
+                                                                                        },
+                                                                                    }}
+                                                                                    modules={[Navigation, CarouselPagination]}
+                                                                                    className="h-64 w-full"
+                                                                                >
+                                                                                    {u.images.map((img, index) => (
+                                                                                        <SwiperSlide key={index}>
+                                                                                        <img
+                                                                                            src={img.dataUrl}
+                                                                                            alt={u.label}
+                                                                                            className="w-full h-64 object-cover"
+                                                                                        />
+                                                                                        </SwiperSlide>
+                                                                                    ))}
+                                                                                </Swiper>
+                                                                            </>
+                                                                        ) : (
+                                                                            <div className="h-32 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
+                                                                                No Image
+                                                                            </div>
+                                                                        )}
+                                                                        <div className="p-4 space-y-2.5">
+                                                                            <h3 className="font-semibold text-amber-800">Unit {u.label}</h3>
+                                                                            <p className="text-sm text-gray-600">{u.unit_type}</p>
+                                                                            <p className="text-sm text-gray-600">Rent: KES {Number(u.rent).toLocaleString() || "—"}</p>
+                                                                            {u.tenant_name && (
+                                                                                <p className="text-xs text-gray-600">Tenant: {u.tenant_name}</p>
+                                                                            )}
+                                                                            <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                                                                                {u.status}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
                                                             </div>
                                                         )}
                                                     </div>
