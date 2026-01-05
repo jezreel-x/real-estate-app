@@ -26,6 +26,17 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data, units }) {
         description: data.description || '',
         status: data.status || 'active',
       });
+    } else {
+      // Reset to default when adding a new property
+      setFormData({
+        property_name: '',
+        property_type: 'Rentals',
+        property_category: 'Apartments',
+        total_units: 0,  // Default to 0 for new properties
+        location: '',
+        description: '',
+        status: 'active',
+      });
     }
   }, [data, units]);
 
@@ -36,15 +47,15 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data, units }) {
     setIsSubmitting(true); // Indicate submission in progress
     try {
       await onSubmit(formData);
-      setFormData({
-        property_name: '',
-        property_type: 'Rentals',
-        property_category: 'Apartments',
-        total_units: '',
-        location: '',
-        description: '',
-        status: 'active',
-      });
+      // setFormData({
+      //   property_name: '',
+      //   property_type: 'Rentals',
+      //   property_category: 'Apartments',
+      //   total_units: '',
+      //   location: '',
+      //   description: '',
+      //   status: 'active',
+      // });
       onClose();
     } catch (error) {
       console.error('Error submitting form:', error);

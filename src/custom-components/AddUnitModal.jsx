@@ -91,6 +91,7 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
                         onChange={(e) => setFormData({ ...formData, unit_type: e.target.value })}
                         className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                             {[
+                                { label: 'Single', value: 'Single' }, 
                                 { label: 'Bedsitter', value: 'Bedsitter' }, 
                                 { label: "1-bedroom", value: "1-bedroom" },
                                 { label: "2-bedroom", value: "2-bedroom" },
