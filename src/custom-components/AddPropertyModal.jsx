@@ -38,7 +38,7 @@ export function AddPropertyModal({ isOpen, onClose, onSubmit, data, units }) {
         status: 'active',
       });
     }
-  }, [data, units]);
+  }, [isOpen, data, units]);
 
   if (!isOpen) return null;
 

@@ -1,56 +1,61 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import ImageUploader from './ImageUploader';
 
 export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
-  const [formData, setFormData] = useState({
-    label: "",
-    unit_type: "Bedsitter",
-    rent: 0,
-    status: "Vacant",
-    // tenant_id: "",
-    tenant_name: "",
-    images: [], // base64 previews (max 5)
-    description: ""
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (data) {
-      setFormData({
-        label: data.label || '',
-        unit_type: data.unit_type || 'Bedsitter',
-        rent: data.rent || 0,
-        status: data.status || 'Vacant',
-        tenant_name: data.tenant_name || '',
-        images: data.images || '',
-        description: data.description || '',
-      });
-    }
-  }, [data]);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true); // Indicate submission in progress
-    try {
-      await onSubmit(formData);
-      setFormData({
-        label: '',
-        unit_type: 'Bedsitter',
+    const [formData, setFormData] = useState({
+        label: "",
+        unit_type: "Bedsitter",
         rent: 0,
-        status: 'Vacant',
-        tenant_name: '',
-        images: [],
-        description: '',
-      });
-      onClose();
-    } catch (error) {
-      console.error('Error submitting form:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+        status: "Vacant",
+        // tenant_id: "",
+        tenant_name: "",
+        images: [], // base64 previews (max 5)
+        description: ""
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (data) {
+            setFormData({
+                label: data.label || '',
+                unit_type: data.unit_type || 'Bedsitter',
+                rent: data.rent || 0,
+                status: data.status || 'Vacant',
+                tenant_name: data.tenant_name || '',
+                images: data.images || '',
+                description: data.description || '',
+            });
+        }
+    }, [data]);
+
+    if (!isOpen) return null;
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true); // Indicate submission in progress
+        try {
+            await onSubmit(formData);
+            setFormData({
+                label: '',
+                unit_type: 'Bedsitter',
+                rent: 0,
+                status: 'Vacant',
+                tenant_name: '',
+                images: [],
+                description: '',
+            });
+            onClose();
+        } catch (error) {
+            console.error('Error submitting form:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleImagesUpdate = (newImages) => {
+        setFormData(prev => ({ ...prev, images: newImages }));
+    };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -115,7 +120,7 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
                         required
                         min="0"
                         value={formData.rent}
-                        onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
+                        onChange={(e) => setFormData({ ...formData, rent: parseInt(e.target.value) })}
                         className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
@@ -152,7 +157,7 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                     Upload images (5 max.) *
                 </label>
-                <input
+                {/* <input
                     type="file"
                     accept="image/*"
                     multiple
@@ -179,6 +184,12 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
                             alt="preview"
                         />
                     ))}
+                </div> */}
+                <div className='flex border border-gray-300 rounded-lg py-3 px-2 flex-wrap gap-4'>
+                    <ImageUploader
+                        images={formData.images}
+                        setImages={handleImagesUpdate}
+                    />
                 </div>
             </div>
 
