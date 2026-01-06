@@ -110,6 +110,14 @@ const Property = () => {
         setShowAddPropertyModal(true);
     };
 
+    const handleEditUnit = (unitData) => {
+        // pre-fills the modal form with selected unit data
+        setCurrentUnit(unitData);
+
+        // then opens up the modal form
+        setShowAddUnitModal(true);
+    };
+
     // filter properties by property_name, property_type, or property_category
     const filteredProperties = properties.filter((property) => {
         const query = searchQuery.trim().toLowerCase();
@@ -134,7 +142,7 @@ const Property = () => {
         setCurrentPage(page);
     };
 
-    // function to handle deleting a tenant with a custom toast notification
+    // function to handle deleting a property with a custom toast notification
     const handleDeleteProperty = (propertyId) => {
         // Show confirmation toast
         if (window.confirm("Are you sure you want to delete this property? This action cannot be undone.")) {
@@ -148,7 +156,7 @@ const Property = () => {
         // toast notification asking for deletion confirmation
         notify(`info`, `Deleting...`);
 
-        // Logic to delete tenant only after confirmation
+        // Logic to delete property only after confirmation
         setTimeout(() => {
             const updatedProperties = properties.filter((p) => p.id !== propertyId);
             setProperties(updatedProperties);
@@ -156,6 +164,28 @@ const Property = () => {
             notify('success', 'Property deleted successfully.');
         }, 3000); // Simulate delay for deletion
 
+    };
+
+    // function to handle deleting a unit with a custom toast notification
+    const handleDeleteUnit = (unitId) => {
+        // Show confirmation toast
+        if (window.confirm("Are you sure you want to delete this unit? This action cannot be undone.")) {
+            handleDeleteUnitConfirmed(unitId);
+        }
+    };
+
+    // function that confirms deletion after user confirmation
+    const handleDeleteUnitConfirmed = (unitId) => {
+        // toast notification asking for deletion confirmation
+        notify(`info`, `Deleting...`);
+
+        // Logic to delete unit only after confirmation
+        setTimeout(() => {
+            const updatedUnits = units.filter((u) => u.id !== unitId);
+            setUnits(updatedUnits);
+            localStorage.setItem('units', JSON.stringify(updatedUnits));
+            notify('success', 'Unit deleted successfully.');
+        }, 3000); // Simulate delay for deletion
     };
     
     return(
@@ -464,9 +494,31 @@ const Property = () => {
                                                                             {u.tenant_name && (
                                                                                 <p className="text-xs text-gray-600">Tenant: {u.tenant_name}</p>
                                                                             )}
-                                                                            <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
-                                                                                {u.status}
-                                                                            </span>
+                                                                            <div className="flex items-center justify-between">
+                                                                                <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                                                                                    {u.status}
+                                                                                </span>
+                                                                                <div>
+                                                                                    <button 
+                                                                                        className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleEditUnit(u);
+                                                                                        }}
+                                                                                    >
+                                                                                        <Pencil className="w-5 h-5" />
+                                                                                    </button>
+                                                                                    <button 
+                                                                                        className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleDeleteUnit(u.id);
+                                                                                        }}
+                                                                                    >
+                                                                                        <Trash2 className="w-5 h-5" />
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 ))}

@@ -127,19 +127,6 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tenant Name *
-                    </label>
-                    <input
-                        type="text"
-                        required
-                        value={formData.tenant_name}
-                        onChange={(e) => setFormData({ ...formData, tenant_name: e.target.value })}
-                        className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
                         Status *
                     </label>
                     <select
@@ -151,6 +138,21 @@ export function AddUnitModal({ isOpen, onClose, onSubmit, data }) {
                         <option value="Occupied">Occupied</option>
                     </select>
                 </div>
+
+                {formData.status === "Occupied" && 
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tenant Name *
+                    </label>
+                    <input
+                        type="text"
+                        required
+                        value={formData.tenant_name}
+                        onChange={(e) => setFormData({ ...formData, tenant_name: e.target.value })}
+                        className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+                }
             </div>
 
             <div>
