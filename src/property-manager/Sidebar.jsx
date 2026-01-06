@@ -26,7 +26,7 @@ const MENU = [
   // { id: "roles", label: "Roles", icon: Anchor, to: "/roles" },
   { id: "business", label: "Business Management", icon: HandCoins },
   // { id: "property", label: "Property", icon: Building2, to: "/property" },
-  { id: "inquiries", label: "Inquiries", icon: Mail, to: "/inquiries" },
+  { id: "inquiries", label: "Inquiries", icon: Mail, to: "/property-manager/inquiries" },
   { id: "tenant", label: "Tenant", icon: Package, to: "/property-manager/tenants" },
   { id: "invoice", label: "Invoice", icon: FileText, to: "/property-manager/invoices" },
   { id: "expense", label: "Expense", icon: CircleDollarSign, to: "/expense" },

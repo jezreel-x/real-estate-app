@@ -28,9 +28,14 @@ const HouseForSaleDetails = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedSchedule, setSelectedSchedule] = useState("In Person");
 
-    const [requestInfoName, setRequestInfoName] = useState("");
-    const [requestInfoEmail, setRequestInfoEmail] = useState("");
-    const [requestInfoMessage, setRequestInfoMessage] = useState("");
+    // const [requestInfoName, setRequestInfoName] = useState("");
+    // const [requestInfoEmail, setRequestInfoEmail] = useState("");
+    // const [requestInfoMessage, setRequestInfoMessage] = useState("");
+    const [requestInfoData, setRequestInfoData] = useState({
+        name: "",
+        email: "",
+        message: ""
+    });
 
     const [scheduleVisitName, setScheduleVisitName] = useState("");
     const [scheduleVisitEmail, setScheduleVisitEmail] = useState("");
@@ -120,6 +125,27 @@ const HouseForSaleDetails = () => {
         setScheduleVisitName("");
         setScheduleVisitEmail("");
         setScheduleVisitPhone("");
+    };
+
+    const handleRequestInfoActionClick = (actionLabel) => {
+
+        // Submit the request info form
+        if (!requestInfoData.name.trim() || !requestInfoData.email.trim() || !requestInfoData.message.trim()) {
+            toast.error("Please fill in all required fields.");
+            return;
+        }
+
+        toast.success("Request submitted successfully!");
+        setRequestInfoData({
+            name: "",
+            email: "",
+            message: ""
+        });
+
+        if (actionLabel === "Submit") {
+            // Handle form submission logic here
+            localStorage.setItem("requestInfoData", JSON.stringify(requestInfoData));
+        }
     };
 
     return (
@@ -235,28 +261,32 @@ const HouseForSaleDetails = () => {
                             <form className="w-full mt-4 space-y-4">
                                 <input 
                                     type="text"
-                                    value={requestInfoName}
-                                    onChange={(e) => setRequestInfoName(e.target.value)}
+                                    value={requestInfoData.name}
+                                    onChange={(e) => setRequestInfoData({...requestInfoData, name: e.target.value})}
                                     placeholder="Your Name"
                                     className="text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full border border-gray-300 px-3 py-4 rounded-lg"
+                                    required
                                 />
                                 <input 
                                     type="email"
-                                    value={requestInfoEmail}
-                                    onChange={(e) => setRequestInfoEmail(e.target.value)}
+                                    value={requestInfoData.email}
+                                    onChange={(e) => setRequestInfoData({...requestInfoData, email: e.target.value})}
                                     placeholder="Your Email"
                                     className="text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full border border-gray-300 px-3 py-4 rounded-lg"
+                                    required
                                 />
                                 <textarea
                                     placeholder="Your Message"
-                                    value={requestInfoMessage}
-                                    onChange={(e) => setRequestInfoMessage(e.target.value)}
+                                    value={requestInfoData.message}
+                                    onChange={(e) => setRequestInfoData({...requestInfoData, message: e.target.value})}
                                     className="resize-none text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full border border-gray-300 px-3 py-4 rounded-lg"
                                     rows="6"
+                                    required
                                 ></textarea>
                                 {requestInfoActions.map((action, index) => (
                                     <button 
                                         key={index}
+                                        onClick={() => handleRequestInfoActionClick(action.label)}
                                         type="button"
                                         className="flex justify-center gap-2 w-full bg-[rgb(0,0,30)] cursor-pointer text-amber-500 px-6 py-4 rounded-lg hover:bg-black transition"
                                     >
