@@ -8,6 +8,7 @@ import "swiper/css/pagination";
 import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { notify } from "@custom-components/toastHelper";
 
 import { Bed, MapPin, ChevronLeft, ChevronRight, Camera, Phone, Mail } from "lucide-react"; // icons (lucide-react)
 import { FcNext } from "react-icons/fc"; // next icon
@@ -32,9 +33,11 @@ const HouseForSaleDetails = () => {
     // const [requestInfoEmail, setRequestInfoEmail] = useState("");
     // const [requestInfoMessage, setRequestInfoMessage] = useState("");
     const [requestInfoData, setRequestInfoData] = useState({
+        id: crypto.randomUUID(),
         name: "",
         email: "",
-        message: ""
+        message: "",
+        dateSubmitted: new Date().toISOString()
     });
 
     const [scheduleVisitName, setScheduleVisitName] = useState("");
@@ -135,17 +138,26 @@ const HouseForSaleDetails = () => {
             return;
         }
 
-        toast.success("Request submitted successfully!");
-        setRequestInfoData({
-            name: "",
-            email: "",
-            message: ""
-        });
+        notify(`info`, `${actionLabel}ing in progress...`);
 
-        if (actionLabel === "Submit") {
-            // Handle form submission logic here
-            localStorage.setItem("requestInfoData", JSON.stringify(requestInfoData));
-        }
+        setTimeout(() => {
+            if (actionLabel === "Submit") {
+                // Handle form submission logic here
+                const existingRequests = JSON.parse(localStorage.getItem("requestInfoData")) || [];
+                localStorage.setItem("requestInfoData", JSON.stringify([...existingRequests, requestInfoData]));
+                toast.success("Information request submitted successfully.");
+            }
+        }, 3000);
+
+        setTimeout(() => {
+            setRequestInfoData({
+                id: crypto.randomUUID(),
+                name: "",
+                email: "",
+                message: "",
+                dateSubmitted: new Date().toISOString()
+            });
+        }, 4000);
     };
 
     return (

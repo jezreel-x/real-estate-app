@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import { StatCard } from "@custom-components/StatCard";
+import { notify } from "@custom-components/toastHelper";
 import Sidebar from "./Sidebar";
 import { CalendarSearch, Clock, Inbox, Mail, MessageCircle, User, VideoIcon, FileText } from "lucide-react";
 import InquiriesEmptyState from "@custom-components/InquiriesEmptyState";
@@ -13,11 +14,13 @@ const Inquiries = () => {
     const [moreInfoRequests, setMoreInfoRequests] = React.useState([]);
     const [scheduledVisits, setScheduledVisits] = React.useState([]);
 
+    const unreadCount = moreInfoRequests.filter(request => !request.isRead).length;
+
     useEffect(() => {
         try {
             const storedInfoRequests = localStorage.getItem('requestInfoData');
             if (storedInfoRequests) {
-                setMoreInfoRequests(JSON.parse(storedInfoRequests));
+                setMoreInfoRequests(Array.isArray(JSON.parse(storedInfoRequests)) ? JSON.parse(storedInfoRequests) : []);
             }
         } catch (error) {
             console.error('Error parsing requestInfoData from localStorage:', error);
@@ -42,6 +45,35 @@ const Inquiries = () => {
         SCHEDULED_VISITS: 'scheduled-visits'
     };
 
+    // function to handle deleting a unit with a custom toast notification
+    const handleDeleteRequest = (inquiryId) => {
+        // Show confirmation toast
+        if (window.confirm("Are you sure you want to delete this inquiry? This action cannot be undone.")) {
+            handleDeleteRequestConfirmed(inquiryId);
+        }
+    };
+
+    const handleDeleteRequestConfirmed = (id) => {
+        // toast notification asking for deletion confirmation
+        notify(`info`, `Deleting...`);
+
+        // Logic to delete unit only after confirmation
+        setTimeout(() => {
+            const updatedRequests = moreInfoRequests.filter((r) => r.id !== id);
+            setMoreInfoRequests(updatedRequests);
+            localStorage.setItem('requestInfoData', JSON.stringify(updatedRequests));
+            notify('success', 'Request deleted successfully.');
+        }, 3000); // Simulate delay for deletion
+    };
+
+    const markAsRead = (id) => {
+        const updatedReadUnreadRequests = moreInfoRequests.map((inq) =>
+            inq.id === id ? { ...inq, isRead: true } : inq
+        );
+        setMoreInfoRequests(updatedReadUnreadRequests);
+        localStorage.setItem("requestInfoData", JSON.stringify(updatedReadUnreadRequests));
+    };
+
     return (
         <>
             <div className="flex flex-col w-full bg-gray-100">
@@ -55,8 +87,8 @@ const Inquiries = () => {
 
                             {/* Stats Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                                <StatCard title="Total Inquiries" value={0} icon={Inbox} iconColor="text-blue-600" iconBgColor="bg-blue-100" subtitle="Inquiries received" />
-                                <StatCard title="New/Unread Inquiries" value={0} icon={Mail} iconColor="text-emerald-600" iconBgColor="bg-emerald-100" subtitle="Unread inquiries" />
+                                <StatCard title="Total Inquiries" value={moreInfoRequests.length + scheduledVisits.length} icon={Inbox} iconColor="text-blue-600" iconBgColor="bg-blue-100" subtitle="Inquiries received" />
+                                <StatCard title="New/Unread Inquiries" value={unreadCount} icon={Mail} iconColor="text-emerald-600" iconBgColor="bg-emerald-100" subtitle="Unread inquiries" />
                                 <StatCard title="More Info Requests" value={moreInfoRequests.length} icon={MessageCircle} iconColor="text-amber-600" iconBgColor="bg-amber-100" subtitle="More Info on a property requests" />
                                 <StatCard title="Scheduled Visits" value={scheduledVisits.length} icon={CalendarSearch} iconColor="text-green-600" iconBgColor="bg-green-100" subtitle="Scheduled Visits by tenant" />
                                 <StatCard title="Upcoming Visits (Next 7 days)" value={0} icon={Clock} iconColor="text-indigo-600" iconBgColor="bg-indigo-100" subtitle="Visits within 7 days" />
@@ -90,7 +122,12 @@ const Inquiries = () => {
                                             moreInfoRequests.length === 0 ? (
                                                 <InquiriesEmptyState title="More Info Requests" message="No more info requests at this time." />
                                             ) : (
-                                                <InquiriesTable requests={moreInfoRequests} columns={['Name', 'Email', 'Message', 'Date Submitted']} />
+                                                <InquiriesTable 
+                                                    requests={moreInfoRequests} 
+                                                    columns={['Name', 'Email', 'Message', 'Date Submitted', 'Actions']}
+                                                    handleDeleteRequest={handleDeleteRequest} 
+                                                    markAsRead={markAsRead}
+                                                />
                                             )
                                         )}
                                         {activeTab === TABS.SCHEDULED_VISITS && (
