@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { setHours, setMinutes } from "date-fns";
+import { set, setHours, setMinutes } from "date-fns";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -26,12 +26,6 @@ const HouseForSaleDetails = () => {
     const [similarHouses, setSimilarHouses] = useState([]);
 
     const [selectedCategory, setSelectedCategory] = useState("Request Info");
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedSchedule, setSelectedSchedule] = useState("In Person");
-
-    // const [requestInfoName, setRequestInfoName] = useState("");
-    // const [requestInfoEmail, setRequestInfoEmail] = useState("");
-    // const [requestInfoMessage, setRequestInfoMessage] = useState("");
     const [requestInfoData, setRequestInfoData] = useState({
         id: crypto.randomUUID(),
         name: "",
@@ -40,9 +34,15 @@ const HouseForSaleDetails = () => {
         dateSubmitted: new Date().toISOString()
     });
 
-    const [scheduleVisitName, setScheduleVisitName] = useState("");
-    const [scheduleVisitEmail, setScheduleVisitEmail] = useState("");
-    const [scheduleVisitPhone, setScheduleVisitPhone] = useState("");
+    const [scheduledVisitData, setScheduledVisitData] = useState({
+        id: crypto.randomUUID(),
+        date: null,
+        scheduleType: "In Person",
+        name: "",
+        email: "",
+        phone: "",
+        dateSubmitted: new Date().toISOString()
+    });
 
     const categories = ["Request Info", "Schedule a Visit"];
 
@@ -105,29 +105,39 @@ const HouseForSaleDetails = () => {
         setSelectedCategory(category);
     };
 
-    const handleScheduleClick = (schedule) => {
-        setSelectedSchedule(schedule);
-    };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle form submission logic here
-        if (!selectedDate) {
+        if (!scheduledVisitData.date) {
             toast.error("Please select a date and time for the visit.");
             return;
         }
 
-        if (!scheduleVisitName.trim() || !scheduleVisitEmail.trim() || !scheduleVisitPhone.trim()) {
+        if (!scheduledVisitData.name.trim() || !scheduledVisitData.email.trim() || !scheduledVisitData.phone.trim()) {
             toast.error("Please fill in all required fields.");
             return;
         }
 
-        toast.success("Visit scheduled for " + selectedDate.toLocaleString());
+        notify(`scheduling`, `Scheduling your visit...`);
+
+        setTimeout(() => {
+            // Handle form submission logic here
+            const existingVisits = JSON.parse(localStorage.getItem("scheduledVisits")) || [];
+            localStorage.setItem("scheduledVisits", JSON.stringify([...existingVisits, scheduledVisitData]));
+            toast.success("Visit scheduled successfully.");
+        }, 4000);
         
-        setSelectedDate(null);
-        setScheduleVisitName("");
-        setScheduleVisitEmail("");
-        setScheduleVisitPhone("");
+        setTimeout(() => {
+            setScheduledVisitData({
+                id: crypto.randomUUID(),
+                date: null,
+                scheduleType: "In Person",
+                name: "",
+                email: "",
+                phone: "",
+                dateSubmitted: new Date().toISOString()
+            });
+        }, 6000);
     };
 
     const handleRequestInfoActionClick = (actionLabel) => {
@@ -317,8 +327,8 @@ const HouseForSaleDetails = () => {
                             {/* Date and time picker can be added here */}
                             <form className="w-full mt-4 space-y-4">
                                 <DatePicker
-                                    selected={selectedDate}
-                                    onChange={(date) => setSelectedDate(date)}
+                                    selected={scheduledVisitData.date}
+                                    onChange={(date) => setScheduledVisitData({...scheduledVisitData, date: date})}
                                     showTimeSelect
                                     minDate={new Date()}
                                     timeFormat="HH:mm"
@@ -331,37 +341,38 @@ const HouseForSaleDetails = () => {
                                 />
                                 <div className="grid grid-cols-2 my-3 gap-2">
                                     {scheduleVisitActions.map((action, index) => (
-                                        <div 
+                                        <button 
                                             key={index} 
                                             className={`flex items-center justify-center text-center gap-2 p-4 m-2 rounded-lg hover:shadow-lg cursor-pointer
-                                                ${selectedSchedule === action.label ? 'bg-[rgb(0,0,30)] text-amber-500' : 'bg-white text-gray-900'}`}
-                                            onClick={() => handleScheduleClick(action.label)}
+                                                ${scheduledVisitData.scheduleType === action.label ? 'bg-[rgb(0,0,30)] text-amber-500' : 'bg-white text-gray-900'}`}
+                                            onClick={() => setScheduledVisitData({...scheduledVisitData, scheduleType: action.label})}
+                                            type="button"
                                         >
                                             {action.icon}
                                             {action.label}
-                                        </div>
+                                        </button>
                                     ))
                                     }
                                 </div>
                                 <h3 className="text-gray-900 text-lg font-semibold mb-3">More Information</h3>
                                 <input 
                                     type="text"
-                                    value={scheduleVisitName}
-                                    onChange={(e) => setScheduleVisitName(e.target.value)}
+                                    value={scheduledVisitData.name}
+                                    onChange={(e) => setScheduledVisitData({...scheduledVisitData, name: e.target.value})}
                                     placeholder="Your Name"
                                     className="text-gray-700 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full border border-gray-300 px-3 py-4 rounded-lg"
                                 />
                                 <input 
                                     type="email"
-                                    value={scheduleVisitEmail}
-                                    onChange={(e) => setScheduleVisitEmail(e.target.value)}
+                                    value={scheduledVisitData.email}
+                                    onChange={(e) => setScheduledVisitData({...scheduledVisitData, email: e.target.value})}
                                     placeholder="Your Email"
                                     className="text-gray-700 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full border border-gray-300 px-3 py-4 rounded-lg"
                                 />
                                 <input 
                                     type="number"
-                                    value={scheduleVisitPhone}
-                                    onChange={(e) => setScheduleVisitPhone(e.target.value)}
+                                    value={scheduledVisitData.phone}
+                                    onChange={(e) => setScheduledVisitData({...scheduledVisitData, phone: e.target.value})}
                                     placeholder="Your Phone Number"
                                     className="text-gray-700 mb-8 focus:outline-none focus:ring-2 focus:ring-blue-400 w-full border border-gray-300 px-3 py-4 rounded-lg"
                                 />

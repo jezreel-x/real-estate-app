@@ -2,7 +2,7 @@ import { Trash2 } from 'lucide-react';
 import { Tooltip } from 'react-tooltip';
 
 // Create a reusable InquiriesTable component
-const InquiriesTable = ({ requests, columns, handleDeleteRequest, markAsRead }) => {
+const InquiriesTable = ({ requests, columns, handleDeleteRequest, markAsRead, activeTab }) => {
 
     return (
         <div className="overflow-x-auto">
@@ -10,7 +10,7 @@ const InquiriesTable = ({ requests, columns, handleDeleteRequest, markAsRead }) 
                 <thead>
                     <tr className="bg-gray-100 border-b border-gray-300">
                         {columns.map((col) => (
-                            <th key={col} className="px-6 py-3 text-left text-sm font-semibold text-gray-700">
+                            <th key={col} className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                 {col}
                             </th>
                         ))}
@@ -27,15 +27,25 @@ const InquiriesTable = ({ requests, columns, handleDeleteRequest, markAsRead }) 
                                 {request.name}
                             </td>
                             <td className="px-6 py-4 text-sm text-gray-900">{request.email}</td>
-                            <td 
-                                className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate"
-                                data-tooltip-id={`message-${request.id}`}
-                                data-tooltip-content={request.message}
-                            >
-                                <Tooltip id={`message-${request.id}`} place="top" effect="solid" className='max-w-lg text-wrap' />
-                                {request.message}
-                            </td>
-                            <td className="px-6 py-4 text-sm text-gray-600">{new Date(request.dateSubmitted).toLocaleString()}</td>
+                            {activeTab === 'scheduled-visits' ? (
+                                <>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{request.phone}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{request.scheduleType}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(request.date).toLocaleString()}</td>
+                                </>
+                            ) : (
+                                <>
+                                    <td 
+                                        className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate"
+                                        data-tooltip-id={`message-${request.id}`}
+                                        data-tooltip-content={request.message}
+                                    >
+                                        <Tooltip id={`message-${request.id}`} place="top" effect="solid" className='max-w-lg text-wrap' />
+                                        {request.message}
+                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(request.dateSubmitted).toLocaleString()}</td>
+                                </>
+                            )}
                             <td className="flex items-center justify-between flex-shrink-0 px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {/* Additional actions can be added here if needed */}
                                 <button 
@@ -48,7 +58,7 @@ const InquiriesTable = ({ requests, columns, handleDeleteRequest, markAsRead }) 
                                 <button
                                     onClick={() => markAsRead(request.id)}
                                     className={`bg-[rgb(0,0,30)] transition-opacity duration-300 text-amber-500 rounded-lg px-4 py-2
-                                        ${request.isRead ? 'opacity-50 cursor-not-allowed' : 'opacity-100'}`}
+                                        ${request.isRead ? 'opacity-50 cursor-not-allowed' : 'opacity-100 cursor-pointer hover:bg-gray-800 hover:text-white'}`}
                                     disabled={request.isRead}
                                 >
                                     {request.isRead ? "Read" : "Mark as read"}

@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import { StatCard } from "@custom-components/StatCard";
 import { notify } from "@custom-components/toastHelper";
 import Sidebar from "./Sidebar";
-import { CalendarSearch, Clock, Inbox, Mail, MessageCircle, User, VideoIcon, FileText } from "lucide-react";
+import { CalendarSearch, Clock, Inbox, Mail, MessageCircle, User, VideoIcon, Search } from "lucide-react";
 import InquiriesEmptyState from "@custom-components/InquiriesEmptyState";
 import InquiriesTable from "@custom-components/InquiriesTable";
+import Pagination from "@custom-components/Pagination";
+import SearchBar from "../custom-components/SearchBar";
 
 const Inquiries = () => {
 
@@ -13,6 +15,9 @@ const Inquiries = () => {
     const [activeTab, setActiveTab] = React.useState("more-info-requests");
     const [moreInfoRequests, setMoreInfoRequests] = React.useState([]);
     const [scheduledVisits, setScheduledVisits] = React.useState([]);
+    const [searchQuery, setSearchQuery] = React.useState("");
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const [itemsPerPage, setItemsPerPage] = React.useState(5);
 
     const unreadCount = moreInfoRequests.filter(request => !request.isRead).length;
 
@@ -74,6 +79,54 @@ const Inquiries = () => {
         localStorage.setItem("requestInfoData", JSON.stringify(updatedReadUnreadRequests));
     };
 
+    {/* Pagination and Search Logic for Info Requests */}
+    // Filter Inquiries by name, email
+    const filteredInfoRequests = moreInfoRequests.filter((info) => {
+        const query = searchQuery.trim().toLowerCase();
+        return(
+            info.name.toLowerCase().includes(query) ||
+            info.email.toLowerCase().includes(query)
+        );
+    });
+
+    const totalPages = Math.ceil(filteredInfoRequests.length / itemsPerPage);
+
+    // Paginate filtered Inquiries (basically, what INQUIRIES (Info Requests) to display for that current page)
+    const paginatedInfoRequests = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredInfoRequests.slice(startIndex, startIndex + itemsPerPage)
+    }, [filteredInfoRequests, itemsPerPage, currentPage]);
+
+    // // handles page change
+    // const handlePageChange = (page) => {
+    //     if (page < 1 || page > totalPages) return;
+    //     setCurrentPage(page);
+    // };
+
+
+    {/* Pagination and Search Logic for Scheduled Visits */}
+    const filteredScheduledVisits = scheduledVisits.filter((visit) => {
+        const query = searchQuery.trim().toLowerCase();
+        return (
+            visit.name.toLowerCase().includes(query) ||
+            visit.email.toLowerCase().includes(query)
+        );
+    });
+
+    const totalPagesScheduledVisits = Math.ceil(filteredScheduledVisits.length / itemsPerPage);
+
+    // Paginate filtered Scheduled Visits
+    const paginatedScheduledVisits = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredScheduledVisits.slice(startIndex, startIndex + itemsPerPage)
+    }, [filteredScheduledVisits, itemsPerPage, currentPage]);
+
+    // handles page change
+    const handlePageChange = (page) => {
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+    };
+
     return (
         <>
             <div className="flex flex-col w-full bg-gray-100">
@@ -92,8 +145,8 @@ const Inquiries = () => {
                                 <StatCard title="More Info Requests" value={moreInfoRequests.length} icon={MessageCircle} iconColor="text-amber-600" iconBgColor="bg-amber-100" subtitle="More Info on a property requests" />
                                 <StatCard title="Scheduled Visits" value={scheduledVisits.length} icon={CalendarSearch} iconColor="text-green-600" iconBgColor="bg-green-100" subtitle="Scheduled Visits by tenant" />
                                 <StatCard title="Upcoming Visits (Next 7 days)" value={0} icon={Clock} iconColor="text-indigo-600" iconBgColor="bg-indigo-100" subtitle="Visits within 7 days" />
-                                <StatCard title="In-Person Visits" value={0} icon={User} iconColor="text-violet-600" iconBgColor="bg-violet-100" subtitle="Physical visits by tenant(s)" />
-                                <StatCard title="Virtual Visits" value={0} icon={VideoIcon} iconColor="text-gray-600" iconBgColor="bg-gray-100" subtitle="Online tour of property" />
+                                <StatCard title="In-Person Visits" value={scheduledVisits.filter(v => v.scheduleType === 'In Person').length} icon={User} iconColor="text-violet-600" iconBgColor="bg-violet-100" subtitle="Physical visits by tenant(s)" />
+                                <StatCard title="Virtual Visits" value={scheduledVisits.filter(v => v.scheduleType === 'Virtual').length} icon={VideoIcon} iconColor="text-gray-600" iconBgColor="bg-gray-100" subtitle="Online tour of property" />
                             </div>
 
                             {/* Additional information and actions */}
@@ -117,24 +170,83 @@ const Inquiries = () => {
 
                                 <div className="p-6">
                                     {/* Then simplify the JSX */}
-                                    <div className="p-6">
+                                    <div className="">
                                         {activeTab === TABS.MORE_INFO && (
                                             moreInfoRequests.length === 0 ? (
                                                 <InquiriesEmptyState title="More Info Requests" message="No more info requests at this time." />
                                             ) : (
-                                                <InquiriesTable 
-                                                    requests={moreInfoRequests} 
-                                                    columns={['Name', 'Email', 'Message', 'Date Submitted', 'Actions']}
-                                                    handleDeleteRequest={handleDeleteRequest} 
-                                                    markAsRead={markAsRead}
-                                                />
+                                                <>
+                                                    <SearchBar 
+                                                        query={searchQuery} 
+                                                        setSearchQuery={setSearchQuery} 
+                                                        setCurrentPage={setCurrentPage} 
+                                                        placeholder="Search inquiries by name, email, or date..."
+                                                    />
+                                                    <InquiriesTable 
+                                                        requests={paginatedInfoRequests} 
+                                                        columns={['Name', 'Email', 'Message', 'Date Submitted', 'Actions']}
+                                                        handleDeleteRequest={handleDeleteRequest} 
+                                                        markAsRead={markAsRead}
+                                                        activeTab={activeTab}
+                                                    />
+
+                                                    {/* If no info requests match the search query, show a message */}
+                                                    {paginatedInfoRequests.length === 0 && (
+                                                        <div className="text-center py-12">
+                                                            <h3 className="text-lg font-medium text-gray-900 mb-2">No info requests found</h3>
+                                                            <p className="text-gray-600">Try adjusting your search criteria.</p>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Pagination Component */}
+                                                    <Pagination
+                                                        currentPage={currentPage}
+                                                        setCurrentPage={setCurrentPage}
+                                                        itemsPerPage={itemsPerPage}
+                                                        setItemsPerPage={setItemsPerPage}
+                                                        handlePageChange={handlePageChange}
+                                                        totalPages={totalPages}
+                                                    />
+                                                </>
                                             )
                                         )}
                                         {activeTab === TABS.SCHEDULED_VISITS && (
                                             scheduledVisits.length === 0 ? (
                                                 <InquiriesEmptyState title="Scheduled Visits" message="No scheduled visits at this time." />
                                             ) : (
-                                                <InquiriesTable requests={scheduledVisits} columns={['Name', 'Email', 'Schedule Type', 'Date']} />
+                                                <>
+                                                    <SearchBar 
+                                                        query={searchQuery} 
+                                                        setSearchQuery={setSearchQuery} 
+                                                        setCurrentPage={setCurrentPage} 
+                                                        placeholder="Search inquiries by name, email, or date..."
+                                                    />
+                                                    <InquiriesTable 
+                                                        requests={paginatedScheduledVisits} 
+                                                        columns={['Name', 'Email', 'Phone', 'Schedule Type', 'Date', 'Actions']}
+                                                        handleDeleteRequest={handleDeleteRequest} 
+                                                        markAsRead={markAsRead} 
+                                                        activeTab={activeTab}
+                                                    />
+
+                                                    {/* If no scheduled visits match the search query, show a message */}
+                                                    {paginatedScheduledVisits.length === 0 && (
+                                                        <div className="text-center py-12">
+                                                            <h3 className="text-lg font-medium text-gray-900 mb-2">No scheduled visits found</h3>
+                                                            <p className="text-gray-600">Try adjusting your search criteria.</p>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Pagination Component */}
+                                                    <Pagination
+                                                        currentPage={currentPage}
+                                                        setCurrentPage={setCurrentPage}
+                                                        itemsPerPage={itemsPerPage}
+                                                        setItemsPerPage={setItemsPerPage}
+                                                        handlePageChange={handlePageChange}
+                                                        totalPages={totalPagesScheduledVisits}
+                                                    />
+                                                </>
                                             )
                                         )}
                                     </div>
