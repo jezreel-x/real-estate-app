@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from "react";
+import { differenceInDays, parseISO } from "date-fns";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import { StatCard } from "@custom-components/StatCard";
 import { notify } from "@custom-components/toastHelper";
@@ -71,12 +72,22 @@ const Inquiries = () => {
         }, 3000); // Simulate delay for deletion
     };
 
+    // function to mark inquiry as read
     const markAsRead = (id) => {
         const updatedReadUnreadRequests = moreInfoRequests.map((inq) =>
             inq.id === id ? { ...inq, isRead: true } : inq
         );
         setMoreInfoRequests(updatedReadUnreadRequests);
         localStorage.setItem("requestInfoData", JSON.stringify(updatedReadUnreadRequests));
+    };
+
+    // function to mark scheduled visit as read
+    const markScheduledVisitAsRead = (id) => {
+        const updatedReadUnreadVisits = scheduledVisits.map((visit) =>
+            visit.id === id ? { ...visit, isRead: true } : visit
+        );
+        setScheduledVisits(updatedReadUnreadVisits);
+        localStorage.setItem("scheduledVisits", JSON.stringify(updatedReadUnreadVisits));
     };
 
     {/* Pagination and Search Logic for Info Requests */}
@@ -127,6 +138,19 @@ const Inquiries = () => {
         setCurrentPage(page);
     };
 
+    const upcomingVisitsCount = useMemo(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // start of today at midnight
+
+        const sevenDaysFromNow = new Date(today); // creating a shallow copy of today midnight in sevenDaysFromNow constant 
+        sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7); // the final result of sevenDaysFromNow, literally
+
+        return scheduledVisits.filter((visit) => {
+            const visitDate = new Date(visit.date); // converts date string (from localStorage) to a valid Date Object
+            return visitDate >= today && visitDate <= sevenDaysFromNow;
+        }).length;
+    }, [scheduledVisits]);
+
     return (
         <>
             <div className="flex flex-col w-full bg-gray-100">
@@ -144,7 +168,7 @@ const Inquiries = () => {
                                 <StatCard title="New/Unread Inquiries" value={unreadCount} icon={Mail} iconColor="text-emerald-600" iconBgColor="bg-emerald-100" subtitle="Unread inquiries" />
                                 <StatCard title="More Info Requests" value={moreInfoRequests.length} icon={MessageCircle} iconColor="text-amber-600" iconBgColor="bg-amber-100" subtitle="More Info on a property requests" />
                                 <StatCard title="Scheduled Visits" value={scheduledVisits.length} icon={CalendarSearch} iconColor="text-green-600" iconBgColor="bg-green-100" subtitle="Scheduled Visits by tenant" />
-                                <StatCard title="Upcoming Visits (Next 7 days)" value={0} icon={Clock} iconColor="text-indigo-600" iconBgColor="bg-indigo-100" subtitle="Visits within 7 days" />
+                                <StatCard title="Upcoming Visits (Next 7 days)" value={upcomingVisitsCount} icon={Clock} iconColor="text-indigo-600" iconBgColor="bg-indigo-100" subtitle="Visits within 7 days" />
                                 <StatCard title="In-Person Visits" value={scheduledVisits.filter(v => v.scheduleType === 'In Person').length} icon={User} iconColor="text-violet-600" iconBgColor="bg-violet-100" subtitle="Physical visits by tenant(s)" />
                                 <StatCard title="Virtual Visits" value={scheduledVisits.filter(v => v.scheduleType === 'Virtual').length} icon={VideoIcon} iconColor="text-gray-600" iconBgColor="bg-gray-100" subtitle="Online tour of property" />
                             </div>
@@ -225,7 +249,7 @@ const Inquiries = () => {
                                                         requests={paginatedScheduledVisits} 
                                                         columns={['Name', 'Email', 'Phone', 'Schedule Type', 'Date', 'Actions']}
                                                         handleDeleteRequest={handleDeleteRequest} 
-                                                        markAsRead={markAsRead} 
+                                                        markAsRead={markScheduledVisitAsRead} 
                                                         activeTab={activeTab}
                                                     />
 
