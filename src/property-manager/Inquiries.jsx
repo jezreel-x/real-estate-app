@@ -153,7 +153,7 @@ const Inquiries = () => {
 
     return (
         <>
-            <div className="flex flex-col w-full bg-gray-100">
+            <div className="flex flex-col w-full bg-gray-100"> 
                 <PropertyManagerNavbar />
                 <div className="flex mt-20">
                     <Sidebar expanded={expanded} setExpanded={setExpanded} />

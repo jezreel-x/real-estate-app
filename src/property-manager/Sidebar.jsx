@@ -29,7 +29,7 @@ const MENU = [
   { id: "inquiries", label: "Inquiries", icon: Mail, to: "/property-manager/inquiries" },
   { id: "tenant", label: "Tenant", icon: Package, to: "/property-manager/tenants" },
   { id: "invoice", label: "Invoice", icon: FileText, to: "/property-manager/invoices" },
-  { id: "expense", label: "Expense", icon: CircleDollarSign, to: "/expense" },
+  { id: "expense", label: "Expense", icon: CircleDollarSign, to: "/property-manager/expenses" },
   { id: "maintainer", label: "Maintainer", icon: Wrench, to: "/maintainer" },
   { id: "requests", label: "Maintenance Requests", icon: Layers, to: "/requests" },
   { id: "additional", label: "Additional Options", icon: ListPlus },
