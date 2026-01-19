@@ -66,7 +66,7 @@ const Footer = () => {
             </div>
             {/* Bottom Copyright Section */}
             <div className="border-t border-gray-500 mt-12 pt-6 text-center text-sm text-gray-300">
-                <p>&copy; 2025 AirHousing. All rights reserved.</p>
+                <p>&copy; 2026 AirHousing. All rights reserved.</p>
             </div>
         </footer>
     );

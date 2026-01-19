@@ -17,4 +17,4 @@ export function StatCard({ title, value, icon: Icon, iconColor, iconBgColor, sub
       </div>
     </div>
   );
-}
+};

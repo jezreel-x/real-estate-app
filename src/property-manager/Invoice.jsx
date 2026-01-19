@@ -284,7 +284,7 @@ const Invoice = () => {
                             onClose={() => setShowAddInvoiceModal(false)} // handles closing the modal
                             onSubmit={handleAddEditInvoice} // handles form submission
                             tenants={tenants} // pass tenants for the dropdown
-                            data={currentInvoice} // pass current invoice for editing
+                            data={currentInvoice} // pass current invoice for editing 
                         />
                     </main>
                 </div>
