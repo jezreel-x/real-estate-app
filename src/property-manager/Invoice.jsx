@@ -282,7 +282,7 @@ const Invoice = () => {
                         <AddInvoiceModal
                             isOpen={showAddInvoiceModal} // controls modal visibility
                             onClose={() => setShowAddInvoiceModal(false)} // handles closing the modal
-                            onSubmit={handleAddEditInvoice} // handles form submission
+                            onSubmit={handleAddEditInvoice} // handles modal form submission
                             tenants={tenants} // pass tenants for the dropdown
                             data={currentInvoice} // pass current invoice for editing 
                         />

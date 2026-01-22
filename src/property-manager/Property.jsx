@@ -20,7 +20,7 @@ const Property = () => {
     const [properties, setProperties] = React.useState(() => {
         const storedProperties = localStorage.getItem('properties');
         return storedProperties ? JSON.parse(storedProperties) : []; 
-    });
+    }); 
     const [units, setUnits] = React.useState(() => {
         const storedUnits = localStorage.getItem('units');
         return storedUnits ? JSON.parse(storedUnits) : []; 

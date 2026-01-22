@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StatCard } from "@custom-components/StatCard";
-import { AddExpenseModal } from "@custom-components/AddExpenseModal";
+import AddExpenseModal from "@custom-components/AddExpenseModal";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { Plus, FileText, AlertTriangle, BarChart3, CheckCircle, Clock, Tags, Wallet } from "lucide-react";
@@ -11,8 +11,38 @@ const Expense = () => {
         const storedExpenses = localStorage.getItem("expenses");
         return storedExpenses ? JSON.parse(storedExpenses) : [];
     });
+    const [properties, setProperties] = useState(() => {
+            const storedProperties = localStorage.getItem('properties');
+            return storedProperties ? JSON.parse(storedProperties) : []; 
+    });
+    const [units, setUnits] = React.useState(() => {
+        const storedUnits = localStorage.getItem('units');
+        return storedUnits ? JSON.parse(storedUnits) : []; 
+    });
     const [expanded, setExpanded] = useState(false);
     const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
+    const [currentExpense, setCurrentExpense] = useState(null);
+
+    const handleAddEditExpense = async (expenseData) => {
+            // Simulate API call
+            // const newInvoice = { id: Date.now(), ...expenseData };
+            // setInvoices((prev) => [...prev, newInvoice]);
+
+            if (currentExpense) {
+                // Edit existing invoice
+                const updatedInvoice = { ...currentExpense, ...expenseData };
+                setInvoices((prev) => prev.map((i) => (i.id === updatedInvoice.id ? updatedInvoice : i)));
+                localStorage.setItem('invoices', JSON.stringify(invoices));
+                notify('success', 'Invoice updated successfully.');
+                setCurrentExpense(null); // Clear current expense after editing
+            } else {
+                // Add new expense
+                const newExpense = { id: crypto.randomUUID(), ...expenseData };
+                setExpenses((prev) => [...prev, newExpense]);
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+                notify('success', 'Expense added successfully.');
+            }
+        };
 
     return (
         <>
@@ -85,7 +115,14 @@ const Expense = () => {
                             </div>
                         </div>
 
-                        {/* <AddExpenseModal /> */}
+                        <AddExpenseModal
+                            isOpen={showAddExpenseModal} // controls modal visibility
+                            onClose={() => setShowAddExpenseModal(false)} // handles closing the modal
+                            onSubmit={handleAddEditExpense} // handles modal form submission
+                            properties={properties} // pass properties for the dropdown
+                            units={units} // pass units for the dropdown
+                            data={currentExpense} // pass current expense for editing
+                        />
                     </main>
                 </div>
             </div>
