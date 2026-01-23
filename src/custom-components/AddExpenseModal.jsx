@@ -41,7 +41,7 @@ const AddExpenseModal = ({ isOpen, onClose, onSubmit, properties, units, data })
                 date: '',
                 category: '',
                 vendor: '',
-                status: 'paid',
+                status: 'Unpaid',
                 description: '',
             });
             onClose();
@@ -116,39 +116,45 @@ const AddExpenseModal = ({ isOpen, onClose, onSubmit, properties, units, data })
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Unit *
-                                </label>
-                                {/* <select
-                                    required
-                                    value={formData.unit}
-                                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                                    className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                    <option className='text-gray-900' value="" disabled>Select a unit</option>
-                                    {units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).map((unit) => (
-                                        <option className='text-gray-900' key={unit.id} value={unit.label}>
-                                            {unit.label}
-                                        </option>
-                                    ))}
-                                </select> */}
-                                <Select
-                                    isClearable
-                                    isSearchable
-                                    placeholder="Select a unit"
-                                    value={formData.unit ? { label: formData.unit, value: formData.unit } : null}
-                                    onChange={(selectedOption) => {
-                                        setFormData({ 
-                                            ...formData, 
-                                            unit: selectedOption ? selectedOption.value : ''
-                                        });
-                                    }}
-                                    options={units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).map((unit) => ({
-                                        label: unit.label,
-                                        value: unit.label
-                                    }))}
-                                    styles={CustomStyles}
-                                />
+                                {formData.property && (
+                                    <>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Unit *
+                                        </label>
+                                            {/* 
+                                                <select
+                                                    required
+                                                    value={formData.unit}
+                                                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                                                    className="w-full px-3 py-2 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                >
+                                                <option className='text-gray-900' value="" disabled>Select a unit</option>
+                                                {units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).map((unit) => (
+                                                    <option className='text-gray-900' key={unit.id} value={unit.label}>
+                                                        {unit.label}
+                                                    </option>
+                                                ))}
+                                                </select> 
+                                            */}
+                                        <Select
+                                            isClearable
+                                            isSearchable
+                                            placeholder="Select a unit"
+                                            value={formData.unit ? { label: formData.unit, value: formData.unit } : null}
+                                            onChange={(selectedOption) => {
+                                                setFormData({ 
+                                                    ...formData, 
+                                                    unit: selectedOption ? selectedOption.value : ''
+                                                });
+                                            }}
+                                            options={units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).map((unit) => ({
+                                                label: unit.label,
+                                                value: unit.label
+                                            }))}
+                                            styles={CustomStyles}
+                                        />
+                                    </>
+                                )}
                             </div>
 
                             <div>
@@ -161,7 +167,7 @@ const AddExpenseModal = ({ isOpen, onClose, onSubmit, properties, units, data })
                                     required
                                     min="0"
                                     value={formData.amount}
-                                    onChange={(e) => setFormData({ ...formData, amount: parseInt(e.target.value) })}
+                                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                                     className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>

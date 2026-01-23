@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { notify } from "@custom-components/toastHelper";
 import { StatCard } from "@custom-components/StatCard";
 import AddExpenseModal from "@custom-components/AddExpenseModal";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
@@ -24,25 +25,33 @@ const Expense = () => {
     const [currentExpense, setCurrentExpense] = useState(null);
 
     const handleAddEditExpense = async (expenseData) => {
-            // Simulate API call
-            // const newInvoice = { id: Date.now(), ...expenseData };
-            // setInvoices((prev) => [...prev, newInvoice]);
+        // Simulate API call
+        // const newInvoice = { id: Date.now(), ...expenseData };
+        // setInvoices((prev) => [...prev, newInvoice]);
 
-            if (currentExpense) {
-                // Edit existing invoice
-                const updatedInvoice = { ...currentExpense, ...expenseData };
-                setInvoices((prev) => prev.map((i) => (i.id === updatedInvoice.id ? updatedInvoice : i)));
-                localStorage.setItem('invoices', JSON.stringify(invoices));
-                notify('success', 'Invoice updated successfully.');
-                setCurrentExpense(null); // Clear current expense after editing
-            } else {
-                // Add new expense
-                const newExpense = { id: crypto.randomUUID(), ...expenseData };
-                setExpenses((prev) => [...prev, newExpense]);
+        if (currentExpense) {
+            // Edit existing expense
+            const updatedExpense = { ...currentExpense, ...expenseData };
+            setExpenses((prev) => prev.map((i) => (i.id === updatedExpense.id ? updatedExpense : i)));
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+            notify('success', 'Expense updated successfully.');
+            setCurrentExpense(null); // Clear current expense after editing
+        } else {
+            // Add new expense
+            const newExpense = { id: crypto.randomUUID(), ...expenseData };
+            setExpenses((prev) => [...prev, newExpense]);
+            try {
                 localStorage.setItem('expenses', JSON.stringify(expenses));
-                notify('success', 'Expense added successfully.');
+            } catch (error) {
+                if (error.name === 'QuotaExceededError') {
+                    console.error('Local storage quota exceeded. Cannot save expense.');
+                    notify('error', 'Failed to save expense: local storage quota exceeded.');
+                    return;
+                }
             }
-        };
+            notify('success', 'Expense added successfully.');
+        }
+    };
 
     return (
         <>
@@ -108,7 +117,7 @@ const Expense = () => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <p></p>
+                                            <p className="text-gray-600 mb-4 text-center">Expenses Added</p>
                                         )}
                                     </>
                                 </div>

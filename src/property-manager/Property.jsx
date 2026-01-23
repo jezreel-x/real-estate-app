@@ -495,7 +495,7 @@ const Property = () => {
                                                                                 <p className="text-xs text-gray-600">Tenant: {u.tenant_name}</p>
                                                                             )}
                                                                             <div className="flex items-center justify-between">
-                                                                                <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                                                                                <span className={`text-xs px-2 py-1 rounded-full ${u.status === 'Occupied' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
                                                                                     {u.status}
                                                                                 </span>
                                                                                 <div>
