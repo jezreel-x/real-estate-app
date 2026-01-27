@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { notify } from "@custom-components/toastHelper";
 import { StatCard } from "@custom-components/StatCard";
 import AddExpenseModal from "@custom-components/AddExpenseModal";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
-import { Plus, FileText, AlertTriangle, BarChart3, CheckCircle, Clock, Tags, Wallet } from "lucide-react";
+import { Plus, FileText, AlertTriangle, BarChart3, CheckCircle, Clock, Tags, Wallet, Trash2, Pencil } from "lucide-react";
+import Pagination from "@custom-components/Pagination";
 
 const Expense = () => {
 
@@ -23,6 +24,9 @@ const Expense = () => {
     const [expanded, setExpanded] = useState(false);
     const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
     const [currentExpense, setCurrentExpense] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
 
     const handleAddEditExpense = async (expenseData) => {
         // Simulate API call
@@ -51,6 +55,33 @@ const Expense = () => {
             }
             notify('success', 'Expense added successfully.');
         }
+    };
+
+    // Filter expenses based on search query (date, property, unit, vendor, category)
+    const filteredExpenses = expenses.filter((expense) => {
+        const query = searchQuery.trim().toLowerCase();
+        return (
+            expense.date.toLowerCase().includes(query) ||
+            expense.property.toLowerCase().includes(query) ||
+            expense.unit.toLowerCase().includes(query) ||
+            expense.vendor.toLowerCase().includes(query) ||
+            expense.category.toLowerCase().includes(query)
+        );
+    });
+
+    // total pages
+    const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage);
+
+    // get current page expenses
+    const paginatedExpenses = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredExpenses.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredExpenses, currentPage, itemsPerPage]);
+
+    // function to handle page change
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber < 1 || pageNumber > totalPages) return;
+        setCurrentPage(pageNumber);
     };
 
     return (
@@ -117,7 +148,88 @@ const Expense = () => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <p className="text-gray-600 mb-4 text-center">Expenses Added</p>
+                                            <>
+                                                <div className="overflow-x-auto">
+                                                    <table className="min-w-full divide-y divide-gray-200">
+                                                        <thead className="bg-gray-50">
+                                                            <tr>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vendor</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="bg-white divide-y divide-gray-200">
+                                                            {paginatedExpenses.map((expense, index) => (
+                                                                <tr 
+                                                                    key={index}
+                                                                    className="hover:bg-gray-50 cursor-pointer transition-all duration-300 animate-[fadeInUp_0.3s_ease-in-out]"
+                                                                >
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{expense.date}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{expense.property}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{expense.unit}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{expense.category}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{expense.vendor}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">KES {expense.amount}</td>
+                                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                                        {expense.status === 'Paid' ? (
+                                                                            <span className="px-2 inline-flex text-xs leading-tight rounded-full bg-green-100 text-green-800">Paid</span>
+                                                                        ) : (
+                                                                            <span className="px-2 inline-flex text-xs leading-tight rounded-full bg-emerald-100 text-emerald-800">Pending</span>
+                                                                        )}
+                                                                    </td>
+                                                                    <td className="flex items-center justify-around py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                        <button 
+                                                                            className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
+                                                                            onClick={(e) => {
+                                                                                // e.stopPropagation();
+                                                                                // handleEditExpense(expense);
+                                                                            }}
+                                                                        >
+                                                                            {/* include an edit icon instead of text */}
+                                                                            <Pencil className="w-5 h-5" />
+                                                                        </button>
+                                                                        <button 
+                                                                            className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                                            onClick={(e) => {
+                                                                                // e.stopPropagation();
+                                                                                // handleDeleteExpense(expense.id);
+                                                                            }}
+                                                                        >
+                                                                            {/* include a delete/trash icon instead of text */}
+                                                                            <Trash2 className="w-5 h-5" />
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
+
+                                                {/* If no expenses match the search query */}
+                                                {filteredExpenses.length === 0 && (
+                                                    <div className="text-center py-12">
+                                                        <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                                                        <h3 className="mt-2 text-sm font-medium text-gray-900">No expenses found</h3>
+                                                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or add a new expense.</p>
+                                                    </div>
+                                                )}
+
+                                                {/* Pagination Controls */}
+                                                <Pagination
+                                                    currentPage={currentPage}
+                                                    setCurrentPage={setCurrentPage}
+                                                    itemsPerPage={itemsPerPage}
+                                                    setItemsPerPage={setItemsPerPage}
+                                                    totalPages={totalPages}
+                                                    handlePageChange={handlePageChange}
+                                                />
+                                            </>
                                         )}
                                     </>
                                 </div>
