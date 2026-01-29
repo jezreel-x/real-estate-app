@@ -61,7 +61,7 @@ const AddExpenseModal = ({ isOpen, onClose, onSubmit, properties, units, data })
 
                     {/* Modal Header */}
                     <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-gray-900">Create Expense</h2>
+                        <h2 className="text-xl font-bold text-gray-900">{data ? "Edit" : "Create"} Expense</h2>
                         <button
                             onClick={onClose} // Close modal on click
                             className="text-gray-400 hover:text-gray-600 transition-colors"

@@ -28,6 +28,32 @@ const Expense = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
 
+    const totalMonthExpenses = expenses
+        .filter((expense) => {
+            const expenseDate = new Date(expense.date);
+            const now = new Date();
+            return expenseDate.getMonth() === now.getMonth() && expenseDate.getFullYear() === now.getFullYear();
+        })
+        .reduce((total, expense) => total + parseFloat(expense.amount || 0), 0);
+
+    const totalExpenses = totalMonthExpenses;
+
+    const paidExpenses = expenses
+        .filter((expense) => expense.status === 'Paid')
+        .reduce((total, expense) => total + parseFloat(expense.amount || 0), 0);
+
+    const pendingExpenses = expenses
+        .filter((expense) => expense.status === 'Unpaid')
+        .reduce((total, expense) => total + parseFloat(expense.amount || 0), 0);
+
+    const currentYear = new Date().getFullYear();
+    const yearToDateExpenses = expenses
+        .filter((expense) => {
+            const expenseDate = new Date(expense.date);
+            return expenseDate.getFullYear() === currentYear;
+        })
+        .reduce((total, expense) => total + parseFloat(expense.amount || 0), 0);
+
     const handleAddEditExpense = async (expenseData) => {
         // Simulate API call
         // const newInvoice = { id: Date.now(), ...expenseData };
@@ -84,6 +110,27 @@ const Expense = () => {
         setCurrentPage(pageNumber);
     };
 
+    // function to handle prompting of whether to delete or not
+    const handleDeleteExpense = (expenseID) => {
+        if (window.confirm('Are you sure you want to delete this expense? This action cannot be undone.')) {
+            handleDeleteExpenseConfirmed(expenseID);
+        }
+    }; 
+
+    // function to confirm deletion of an expense
+    const handleDeleteExpenseConfirmed = (expenseID) => {
+
+        // loading notification for deletion process
+        notify('info', 'Deleting Expense...');
+
+        setTimeout(() => {
+            const updatedExpenses = expenses.filter((expense) => expense.id !== expenseID);
+            setExpenses(updatedExpenses);
+            localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
+            notify('success', 'Expense deleted successfully!!!');
+        }, 3000);
+    };
+
     return (
         <>
             <div className="flex flex-col w-full bg-gray-100">
@@ -98,10 +145,10 @@ const Expense = () => {
 
                             {/* Stat Cards */}
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                                <StatCard title="Total Expenses (This Month)" value={0} icon={Wallet} iconColor="text-blue-600" iconBgColor="bg-blue-100" subtitle="Snapshot of current cash outflow" />
-                                <StatCard title="Year-To-Date Expenses" value={0} icon={BarChart3} iconColor="text-indigo-600" iconBgColor="bg-indigo-100" subtitle="Tracks annual spending" />
-                                <StatCard title="Paid Expenses" value={0} icon={CheckCircle} iconColor="text-green-600" iconBgColor="bg-green-100" subtitle="Confirmed payments" />
-                                <StatCard title="Pending Expenses" value={0} icon={Clock} iconColor="text-amber-600" iconBgColor="bg-amber-100" subtitle="Highlights unpaid obligations" />
+                                <StatCard title="Total Expenses (This Month)" value={`KES ${totalExpenses.toLocaleString()}`} icon={Wallet} iconColor="text-blue-600" iconBgColor="bg-blue-100" subtitle="Snapshot of current cash outflow" />
+                                <StatCard title="Year-To-Date Expenses" value={`KES ${yearToDateExpenses.toLocaleString()}`} icon={BarChart3} iconColor="text-indigo-600" iconBgColor="bg-indigo-100" subtitle="Tracks annual spending" />
+                                <StatCard title="Paid Expenses" value={`KES ${paidExpenses.toLocaleString()}`} icon={CheckCircle} iconColor="text-green-600" iconBgColor="bg-green-100" subtitle="Confirmed payments" />
+                                <StatCard title="Pending Expenses" value={`KES ${pendingExpenses.toLocaleString()}`} icon={Clock} iconColor="text-amber-600" iconBgColor="bg-amber-100" subtitle="Highlights unpaid obligations" />
                                 <StatCard title="Overdue Expenses" value={0} icon={AlertTriangle} iconColor="text-red-600" iconBgColor="bg-red-100" subtitle="Flags urgent financial issues" />
                                 <StatCard title="Top Expenses" value={0} icon={Tags} iconColor="text-purple-600" iconBgColor="bg-purple-100" subtitle="Most frequent expenses" />
                             </div>
@@ -177,17 +224,18 @@ const Expense = () => {
                                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">KES {expense.amount}</td>
                                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                                         {expense.status === 'Paid' ? (
-                                                                            <span className="px-2 inline-flex text-xs leading-tight rounded-full bg-green-100 text-green-800">Paid</span>
+                                                                            <span className="px-2 py-1 text-xs leading-tight rounded-full bg-green-100 text-green-800">Paid</span>
                                                                         ) : (
-                                                                            <span className="px-2 inline-flex text-xs leading-tight rounded-full bg-emerald-100 text-emerald-800">Pending</span>
+                                                                            <span className="px-2 py-1 text-xs leading-tight rounded-full bg-amber-100 text-amber-800">Pending</span>
                                                                         )}
                                                                     </td>
-                                                                    <td className="flex items-center justify-around py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                         <button 
                                                                             className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
-                                                                            onClick={(e) => {
+                                                                            onClick={() => {
                                                                                 // e.stopPropagation();
-                                                                                // handleEditExpense(expense);
+                                                                                setShowAddExpenseModal(true);
+                                                                                setCurrentExpense(expense);
                                                                             }}
                                                                         >
                                                                             {/* include an edit icon instead of text */}
@@ -195,9 +243,8 @@ const Expense = () => {
                                                                         </button>
                                                                         <button 
                                                                             className="text-red-600 hover:text-red-900 cursor-pointer"
-                                                                            onClick={(e) => {
-                                                                                // e.stopPropagation();
-                                                                                // handleDeleteExpense(expense.id);
+                                                                            onClick={() => {
+                                                                                handleDeleteExpense(expense.id)
                                                                             }}
                                                                         >
                                                                             {/* include a delete/trash icon instead of text */}

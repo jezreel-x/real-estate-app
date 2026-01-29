@@ -217,7 +217,7 @@ const Tenant = () => {
                                     icon={DollarSign}
                                     iconColor="text-emerald-600"
                                     iconBgColor="bg-emerald-100"
-                                    subtitle="From active tenants"
+                                    subtitle="From active tenants" 
                                 />
                                 {/* <TenantStatCard
                                     title="Pending Invoices"
