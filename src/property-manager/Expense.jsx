@@ -57,6 +57,12 @@ const Expense = () => {
         }
     };
 
+    // edits an expense
+    const handleEditExpense = (expense) => {
+        setCurrentExpense(expense);
+        setShowAddExpenseModal(true);
+    };
+
     // Filter expenses based on search query (date, property, unit, vendor, category)
     const filteredExpenses = expenses.filter((expense) => {
         const query = searchQuery.trim().toLowerCase();
@@ -185,9 +191,9 @@ const Expense = () => {
                                                                     <td className="flex items-center justify-around py-4 whitespace-nowrap text-sm text-gray-500">
                                                                         <button 
                                                                             className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
-                                                                            onClick={(e) => {
+                                                                            onClick={() => {
                                                                                 // e.stopPropagation();
-                                                                                // handleEditExpense(expense);
+                                                                                handleEditExpense(expense);
                                                                             }}
                                                                         >
                                                                             {/* include an edit icon instead of text */}
@@ -195,7 +201,7 @@ const Expense = () => {
                                                                         </button>
                                                                         <button 
                                                                             className="text-red-600 hover:text-red-900 cursor-pointer"
-                                                                            onClick={(e) => {
+                                                                            onClick={() => {
                                                                                 // e.stopPropagation();
                                                                                 // handleDeleteExpense(expense.id);
                                                                             }}
