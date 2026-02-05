@@ -2,7 +2,7 @@ import { useState } from "react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
-import { BarChart3, CheckCircle, ShieldCheck, UserCheck, Users, Wallet, Plus, FileText } from "lucide-react";
+import { BarChart3, CheckCircle, ShieldCheck, UserCheck, Users, Wallet, Plus, FileText, Pencil, Trash2 } from "lucide-react";
 
 const ServiceProvider = () => {
     const [serviceProviders, setServiceProviders] = useState(() => {
@@ -11,6 +11,7 @@ const ServiceProvider = () => {
     });
     const [expanded, setExpanded] = useState(true);
     const [showAddServiceProviderModal, setShowAddServiceProviderModal] = useState(false);
+    const [currentServiceProvider, setCurrentServiceProvider] = useState(null);
 
     return (
         <>
@@ -77,7 +78,60 @@ const ServiceProvider = () => {
                                             ) : (
                                                 <>
                                                     {/* Render list of service providers */}
-                                                    <p className="text-gray-900 font-medium">Table Goes Here</p>
+                                                    <div className="overflow-x-auto">
+                                                        <table className="min-w-full divide-y divide-gray-200">
+                                                            <thead className="bg-gray-50">
+                                                                <tr>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specialization</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contract Type</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jobs Completed</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost Incurred</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className="bg-white divide-y divide-gray-200">
+                                                                {paginatedServiceProviders.map((provider, index) => (
+                                                                    <tr 
+                                                                        key={index}
+                                                                        className="hover:bg-gray-50 cursor-pointer transition-all duration-300 animate-[fadeInUp_0.3s_ease-in-out]"
+                                                                    >
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.name}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.specialization}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.phone}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.contractType}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.status}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.jobsCompleted}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">KES {provider.totalCostIncurred}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                            <button 
+                                                                                className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
+                                                                                onClick={() => {
+                                                                                    // e.stopPropagation();
+                                                                                    setShowAddServiceProviderModal(true);
+                                                                                    setCurrentServiceProvider(provider);
+                                                                                }}
+                                                                            >
+                                                                                {/* include an edit icon instead of text */}
+                                                                                <Pencil className="w-5 h-5" />
+                                                                            </button>
+                                                                            <button 
+                                                                                className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                                                onClick={() => {
+                                                                                    handleDeleteServiceProvider(provider.id)
+                                                                                }}
+                                                                            >
+                                                                                {/* include a delete/trash icon instead of text */}
+                                                                                <Trash2 className="w-5 h-5" />
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </>
                                             )}
                                         </>
