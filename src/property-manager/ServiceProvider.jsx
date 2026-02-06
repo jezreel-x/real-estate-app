@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { notify } from "@custom-components/toastHelper";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
 import { BarChart3, CheckCircle, ShieldCheck, UserCheck, Users, Wallet, Plus, FileText, Pencil, Trash2 } from "lucide-react";
+import AddServiceProviderModal from "@custom-components/AddServiceProviderModal";
+import Pagination from "@custom-components/Pagination";
 
 const ServiceProvider = () => {
     const [serviceProviders, setServiceProviders] = useState(() => {
@@ -12,6 +15,68 @@ const ServiceProvider = () => {
     const [expanded, setExpanded] = useState(true);
     const [showAddServiceProviderModal, setShowAddServiceProviderModal] = useState(false);
     const [currentServiceProvider, setCurrentServiceProvider] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
+
+    const handleAddEditServiceProvider = async (serviceProviderData) => {
+        // Simulate API call delay
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        if (currentServiceProvider) {
+            // Edit existing service provider
+            const updatedServiceProvider = { ...currentServiceProvider, ...serviceProviderData };
+            const updated = serviceProviders.map((i) => (i.id === updatedServiceProvider.id ? updatedServiceProvider : i));
+            setServiceProviders(updated);
+            localStorage.setItem('serviceProviders', JSON.stringify(updated));
+            notify('success', 'Service provider updated successfully.');
+            setCurrentServiceProvider(null); // Clear current service provider after editing
+        } else {
+            // Add new service provider
+            const newServiceProvider = { id: crypto.randomUUID(), ...serviceProviderData };
+            const updated = [...serviceProviders, newServiceProvider];
+            setServiceProviders(updated);
+            try {
+                localStorage.setItem('serviceProviders', JSON.stringify(updated));
+            } catch (error) {
+                if (error.name === 'QuotaExceededError') {
+                    console.error('Local storage quota exceeded. Cannot save service provider.');
+                    notify('error', 'Failed to save service provider: local storage quota exceeded.');
+                    return;
+                }
+            }
+            notify('success', 'Service provider added successfully.');
+        }
+    };
+
+    // Filter service providers based  based on their name, specialization, or contract type
+    const filteredServiceProviders = serviceProviders.filter((provider) => {
+        const query = searchQuery.trim().toLowerCase();
+        return (
+            provider.name.toLowerCase().includes(query) ||
+            provider.specialization.toLowerCase().includes(query) ||
+            provider.contractType.toLowerCase().includes(query)
+        );
+    });
+
+    // Pagination logic
+    // total pages based on filtered service providers
+    const totalPages = Math.ceil(filteredServiceProviders.length / itemsPerPage);
+
+    // get current page service providers
+    const paginatedServiceProviders = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredServiceProviders.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredServiceProviders, currentPage, itemsPerPage]);
+
+    // function to handle page change
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
 
     return (
         <>
@@ -102,9 +167,9 @@ const ServiceProvider = () => {
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.specialization}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.phone}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.contractType}</td>
-                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.status}</td>
-                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.jobsCompleted}</td>
-                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">KES {provider.totalCostIncurred}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.availabilityStatus}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.jobsCompleted || 0}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">KES {Number(provider.totalCostIncurred).toLocaleString()}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                             <button 
                                                                                 className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
@@ -132,12 +197,38 @@ const ServiceProvider = () => {
                                                             </tbody>
                                                         </table>
                                                     </div>
+
+                                                    {/* If no service providers match the search query */}
+                                                    {filteredServiceProviders.length === 0 && (
+                                                        <div className="text-center py-12">
+                                                            <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                                                            <h3 className="mt-2 text-sm font-medium text-gray-900">No service providers found</h3>
+                                                            <p className="mt-1 text-sm text-gray-500">Try adjusting your search or add a new service provider.</p>
+                                                        </div>
+                                                    )}
+    
+                                                    {/* Pagination Controls */}
+                                                    <Pagination
+                                                        currentPage={currentPage}
+                                                        setCurrentPage={setCurrentPage}
+                                                        itemsPerPage={itemsPerPage}
+                                                        setItemsPerPage={setItemsPerPage}
+                                                        totalPages={totalPages}
+                                                        handlePageChange={handlePageChange}
+                                                    />
                                                 </>
                                             )}
                                         </>
                                     </div>
                                 </div>
                             </div>
+
+                            <AddServiceProviderModal 
+                                isOpen={showAddServiceProviderModal} // controls modal visibility
+                                data={currentServiceProvider} // passes current service provider data for editing (null for adding new)
+                                onSubmit={handleAddEditServiceProvider} // handles modal form submission
+                                onClose={() => setShowAddServiceProviderModal(false)} // function to close the modal
+                            />
                         </main>
                 </div>
             </div>
