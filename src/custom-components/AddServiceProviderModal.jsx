@@ -13,6 +13,8 @@ const AddServiceProviderModal = ({ isOpen, data, onSubmit, onClose }) => {
         contractType: '',
         totalCostIncurred: '',
         availabilityStatus: 'Available',
+        jobsCompletedStatus: '',
+        date: '',
         notes: '',
     });
 
@@ -41,6 +43,8 @@ const AddServiceProviderModal = ({ isOpen, data, onSubmit, onClose }) => {
                 email: '',
                 contractType: '',
                 availabilityStatus: 'Available',
+                jobsCompletedStatus: '',
+                date: '',
                 notes: '',
             });
             onClose();
@@ -201,6 +205,43 @@ const AddServiceProviderModal = ({ isOpen, data, onSubmit, onClose }) => {
                                     styles={CustomStyles}
                                 />
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Job Status *
+                                </label>
+                                <Select
+                                    isClearable
+                                    isSearchable
+                                    placeholder="Select a job status"
+                                    value={formData.jobsCompletedStatus ? { label: formData.jobsCompletedStatus, value: formData.jobsCompletedStatus } : null}
+                                    onChange={(selectedOption) => {
+                                        setFormData({ 
+                                            ...formData, 
+                                            jobsCompletedStatus: selectedOption ? selectedOption.value : ''
+                                        });
+                                    }}
+                                    options={[ 
+                                        { label: 'In Progress', value: 'In Progress' }, 
+                                        { label: 'Completed', value: 'Completed' }, 
+                                        { label: 'Cancelled', value: 'Cancelled' }
+                                    ]}
+                                    styles={CustomStyles}
+                                />
+                            </div>
+                            {formData.jobsCompletedStatus === 'Completed' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Job Completion Date *
+                                    </label>
+                                    <input
+                                        type="date"
+                                        required
+                                        value={formData.date}
+                                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                        className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                     

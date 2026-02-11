@@ -3,7 +3,7 @@ import { notify } from "@custom-components/toastHelper";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
-import { BarChart3, CheckCircle, ShieldCheck, UserCheck, Users, Wallet, Plus, FileText, Pencil, Trash2, Search } from "lucide-react";
+import { BarChart3, CheckCircle, ShieldCheck, UserCheck, Users, Wallet, Plus, FileText, Pencil, Trash2, Search, Wrench, XCircle } from "lucide-react";
 import AddServiceProviderModal from "@custom-components/AddServiceProviderModal";
 import Pagination from "@custom-components/Pagination";
 
@@ -20,6 +20,52 @@ const ServiceProvider = () => {
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
+
+    // Calculate total service providers and active service providers for stat cards
+    const totalServiceProviders = serviceProviders.length;
+    const activeServiceProviders = serviceProviders.filter(provider => provider.availabilityStatus === 'Available').length;
+    const retainerServiceProviders = serviceProviders.filter(provider => provider.contractType === 'Retainer').length;
+    const totalCostIncurred = serviceProviders.reduce((total, provider) => total + (Number(provider.totalCostIncurred) || 0), 0);
+    const jobsCompleted = serviceProviders.filter(provider => provider.jobsCompletedStatus === 'Completed').length;
+    const totalCostIncurredForCompletedJobs = serviceProviders
+        .filter(provider => provider.jobsCompletedStatus === 'Completed')
+        .reduce((total, provider) => total + (Number(provider.totalCostIncurred) || 0), 0);
+    const averageJobCost = jobsCompleted > 0 ? parseInt(totalCostIncurredForCompletedJobs / jobsCompleted) : 0;
+    const jobsCompletedThisMonth = serviceProviders.filter(provider => {
+        if (provider.jobsCompletedStatus === 'Completed' && provider.date) {
+            const completionDate = new Date(provider.date);
+            const now = new Date();
+            return completionDate.getMonth() === now.getMonth() && completionDate.getFullYear() === now.getFullYear();
+        }
+        return false;
+    }).length;
+
+    // Job Status Configuration
+    const statusConfig = {
+        "In Progress": {
+            icon: Wrench,
+            className: "bg-purple-100 text-purple-700",
+        },
+        "Completed": {
+            icon: CheckCircle,
+            className: "bg-green-100 text-green-700",
+        },
+        "Cancelled": {
+            icon: XCircle,
+            className: "bg-red-100 text-red-700",
+        },
+    };
+
+    const jobsStatusStyles = (status) => {
+        const config = statusConfig[status] || {};
+        const Icon = config.icon || FileText; // Default icon if status is unrecognized
+        return (
+            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.className || 'bg-gray-100 text-gray-700'}`}>
+                <Icon className="w-3 h-3 mr-1" />
+                {status || 'Unknown'}
+            </span>
+        );
+    };
 
     const handleAddEditServiceProvider = async (serviceProviderData) => {
         // Simulate API call delay
@@ -78,6 +124,27 @@ const ServiceProvider = () => {
         }
     };
 
+    // function to handle prompting of whether to delete or not
+    const handleDeleteServiceProvider = (serviceProviderID) => {
+        if (window.confirm('Are you sure you want to delete this service provider? This action cannot be undone.')) {
+            handleDeleteServiceProviderConfirmed(serviceProviderID);
+        }
+    }; 
+
+    // function to confirm deletion of an expense
+    const handleDeleteServiceProviderConfirmed = (serviceProviderID) => {
+
+        // loading notification for deletion process
+        notify('info', 'Deleting Service Provider...');
+
+        setTimeout(() => {
+            const updatedServiceProviders = serviceProviders.filter((provider) => provider.id !== serviceProviderID);
+            setServiceProviders(updatedServiceProviders);
+            localStorage.setItem('serviceProviders', JSON.stringify(updatedServiceProviders));
+            notify('success', 'Service Provider deleted successfully!!!');
+        }, 3000);
+    };
+
     return (
         <>
             <div className="flex flex-col w-full bg-gray-100">
@@ -91,12 +158,12 @@ const ServiceProvider = () => {
 
                                 {/* Stat Cards */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                                    <StatCard title="Total Service Providers" value={0} icon={Users} iconColor="text-blue-600" iconBgColor="bg-blue-100" subtitle="Number of service providers in the system" />
-                                    <StatCard title="Active Service Providers" value={0} icon={UserCheck} iconColor="text-green-600" iconBgColor="bg-green-100" subtitle="Number of active service providers in the system" />
-                                    <StatCard title="Service Providers on Retainer" value={0} icon={ShieldCheck} iconColor="text-purple-600" iconBgColor="bg-purple-100" subtitle="Number of verified service providers in the system" />
-                                    <StatCard title="Jobs Completed (This Month)" value={0} icon={CheckCircle} iconColor="text-emerald-600" iconBgColor="bg-emerald-100" subtitle="Number of jobs completed this month" />
-                                    <StatCard title="Total Maintenance Cost" value={0} icon={Wallet} iconColor="text-red-600" iconBgColor="bg-red-100" subtitle="Total maintenance cost for all service providers" />
-                                    <StatCard title="Average Job Cost" value={0} icon={BarChart3} iconColor="text-orange-600" iconBgColor="bg-orange-100" subtitle="Average cost of jobs completed" />
+                                    <StatCard title="Total Service Providers" value={totalServiceProviders} icon={Users} iconColor="text-blue-600" iconBgColor="bg-blue-100" subtitle="Number of service providers in the system" />
+                                    <StatCard title="Active Service Providers" value={activeServiceProviders} icon={UserCheck} iconColor="text-green-600" iconBgColor="bg-green-100" subtitle="Number of active service providers in the system" />
+                                    <StatCard title="Service Providers on Retainer" value={retainerServiceProviders} icon={ShieldCheck} iconColor="text-purple-600" iconBgColor="bg-purple-100" subtitle="Number of verified service providers in the system" />
+                                    <StatCard title="Jobs Completed (This Month)" value={jobsCompletedThisMonth} icon={CheckCircle} iconColor="text-emerald-600" iconBgColor="bg-emerald-100" subtitle="Number of jobs completed this month" />
+                                    <StatCard title="Total Maintenance Cost" value={`KES ${totalCostIncurred.toLocaleString()}`} icon={Wallet} iconColor="text-red-600" iconBgColor="bg-red-100" subtitle="Total maintenance cost for all service providers" />
+                                    <StatCard title="Average Job Cost" value={`KES ${averageJobCost.toLocaleString()}`} icon={BarChart3} iconColor="text-orange-600" iconBgColor="bg-orange-100" subtitle="Average cost of jobs completed" />
                                 </div>
 
                                 {/* Additional content such as tables or charts can be added here */}
@@ -142,7 +209,6 @@ const ServiceProvider = () => {
                                                 </div>
                                             ) : (
                                                 <>
-
                                                     {/* Search Bar */}
                                                     <div className="mb-4 relative">
                                                     {/* Add an icon inside the search input if desired */}
@@ -173,7 +239,8 @@ const ServiceProvider = () => {
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contract Type</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jobs Completed</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jobs Status</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Completed</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Cost Incurred</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                                                 </tr>
@@ -189,7 +256,10 @@ const ServiceProvider = () => {
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.phone}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.contractType}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.availabilityStatus}</td>
-                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.jobsCompleted || 0}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                                            {jobsStatusStyles(provider.jobsCompletedStatus)}
+                                                                        </td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.date}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">KES {Number(provider.totalCostIncurred).toLocaleString()}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                             <button 
