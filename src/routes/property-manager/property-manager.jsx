@@ -8,6 +8,7 @@ const Property = lazy(() => import("../../property-manager/Property"));
 const Inquiries = lazy(() => import("../../property-manager/Inquiries"));
 const Expense = lazy(() => import("../../property-manager/Expense"));
 const ServiceProvider = lazy(() => import("../../property-manager/ServiceProvider"));
+const MaintenaceRequests = lazy(() => import("../../property-manager/MaintenanceRequests"));
 
 {/* Property Manager Routes */}
 const propertyManagerRoutes = [
@@ -18,6 +19,7 @@ const propertyManagerRoutes = [
     <Route path="/property-manager/inquiries" element={<Inquiries />} key="property-manager-inquiries" />,
     <Route path="/property-manager/expenses" element={<Expense />} key="property-manager-expenses" />,
     <Route path="/property-manager/maintainer" element={<ServiceProvider />} key="property-manager-maintainer" />,
+    <Route path="/property-manager/maintenance-requests" element={<MaintenaceRequests />} key="property-manager-maintenance-requests" />
 ];
 
 export default propertyManagerRoutes;

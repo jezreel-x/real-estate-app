@@ -31,7 +31,7 @@ const MENU = [
   { id: "invoice", label: "Invoice", icon: FileText, to: "/property-manager/invoices" },
   { id: "expense", label: "Expense", icon: CircleDollarSign, to: "/property-manager/expenses" },
   { id: "maintainer", label: "Maintainer", icon: Wrench, to: "/property-manager/maintainer" },
-  { id: "requests", label: "Maintenance Requests", icon: Layers, to: "/property-manager/requests" },
+  { id: "requests", label: "Maintenance Requests", icon: Layers, to: "/property-manager/maintenance-requests" },
   { id: "additional", label: "Additional Options", icon: ListPlus },
   { id: "reports", label: "Reports", icon: FileText, to: "/property-manager/reports" },
   { id: "support", label: "Support", icon: FcCustomerSupport, to: "/property-manager/support" },
