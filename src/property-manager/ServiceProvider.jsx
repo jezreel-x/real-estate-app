@@ -259,7 +259,7 @@ const ServiceProvider = () => {
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                                             {jobsStatusStyles(provider.jobsCompletedStatus)}
                                                                         </td>
-                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.date}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{provider.date || 'N/A'}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">KES {Number(provider.totalCostIncurred).toLocaleString()}</td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                             <button 
