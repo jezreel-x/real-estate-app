@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertCircle, AlertTriangle, CheckCircle, ClipboardList, Timer, Wrench, Plus } from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle, ClipboardList, Timer, Wrench, Plus, FileText, Search } from "lucide-react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
@@ -8,6 +8,20 @@ const MaintenaceRequests = () => {
 
     const [expanded, setExpanded] = useState(false);
     const [showAddMaintenanceRequestModal, setShowAddMaintenanceRequestModal] = useState(false);
+    const [maintenanceRequests, setMaintenanceRequests] = useState(() => {
+        const storedRequests = localStorage.getItem("maintenanceRequests");
+        return storedRequests ? JSON.parse(storedRequests) : [];
+    });
+     const [properties, setProperties] = useState(() => {
+        const storedProperties = localStorage.getItem('properties');
+        return storedProperties ? JSON.parse(storedProperties) : []; 
+    });
+    const [units, setUnits] = useState(() => {
+        const storedUnits = localStorage.getItem('units');
+        return storedUnits ? JSON.parse(storedUnits) : []; 
+    });
+    const [searchQuery, setSearchQuery] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
 
     return (
         <>
@@ -55,7 +69,49 @@ const MaintenaceRequests = () => {
                                         </div>
                                     </div>
 
-                                    <div></div>
+                                    <div className="p-6">
+                                        <>
+                                            {/* Table or list of service providers would go here */}
+                                            {maintenanceRequests.length === 0 ? (
+                                                <div className="text-center py-12">
+                                                    <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                                                    <h3 className="text-lg font-medium text-gray-900 mb-2">No maintenance requests yet</h3>
+                                                    <p className="text-gray-600 mb-4">Create your first maintenance request to start tracking maintenance requests</p>
+                                                    <button
+                                                        onClick={() => setShowAddMaintenanceRequestModal(true)}
+                                                        className="inline-flex cursor-pointer items-center gap-2 px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors"
+                                                    >
+                                                        <Plus className="w-5 h-5" />
+                                                        Create Maintenance Request
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    {/* Search Bar */}
+                                                    <div className="mb-4 relative">
+                                                    {/* Add an icon inside the search input if desired */}
+                                                        <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                                                        <input
+                                                            type="text"
+                                                            value={searchQuery}
+                                                            placeholder="Search maintenance requests by title, description, or status..."
+                                                            className="w-[50%] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+                                                            text-gray-900 pl-10 transition-all duration-300"
+                                                            onChange={
+                                                                (e) => {
+                                                                    setSearchQuery(e.target.value)
+                                                                    setCurrentPage(1); // Reset to first page on new search
+                                                                }
+                                                            }
+                                                            // Add onChange handler to update search state here
+                                                        />
+                                                    </div>
+
+                                                    {/* Render list of Maintenance Requests */}
+                                                </>
+                                            )}
+                                        </>
+                                    </div>
                                 </div>
                             </div>
                         </main>
