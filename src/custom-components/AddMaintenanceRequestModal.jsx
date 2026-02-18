@@ -6,7 +6,7 @@ import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, properties, units }) => {
+const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, properties, units, tenants }) => {
 
     const [formData, setFormData] = useState({
         // Define your form fields here
@@ -131,17 +131,31 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                             </div>
 
                             {formData.unit && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Tenant Name *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        readOnly
-                                        value={formData.unit ? units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).find(u => u.label === formData.unit)?.tenant_name : ''}
-                                        placeholder="Enter tenant name"
-                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 transition-all duration-300 hover:cursor-not-allowed bg-gray-100"
-                                    />
+                                <div className="col-span-1 md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Tenant Name *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={formData.unit ? units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).find(u => u.label === formData.unit)?.tenant_name : ''}
+                                            placeholder="Enter tenant name"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 transition-all duration-300 hover:cursor-not-allowed bg-gray-100"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Tenant Phone Number *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            readOnly
+                                            value={formData.unit ? tenants.find(t => t.plot_number === formData.unit)?.phone : ''}
+                                            placeholder="Enter tenant phone number"
+                                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 transition-all duration-300 hover:cursor-not-allowed bg-gray-100"
+                                        />
+                                    </div>
                                 </div>
                             )}
 
@@ -216,6 +230,8 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                                 />
                             </div>
                         </div>
+
+                        {/* Image upload and description fields can be added here */}
                     </form>
 
                 </div>

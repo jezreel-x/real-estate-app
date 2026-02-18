@@ -3,6 +3,7 @@ import { AlertCircle, AlertTriangle, CheckCircle, ClipboardList, Timer, Wrench, 
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
+import { notify } from "@custom-components/toastHelper";
 import AddMaintenanceRequestModal from "../custom-components/AddMaintenanceRequestModal";
 
 const MaintenaceRequests = () => {
@@ -20,6 +21,10 @@ const MaintenaceRequests = () => {
     const [units, setUnits] = useState(() => {
         const storedUnits = localStorage.getItem('units');
         return storedUnits ? JSON.parse(storedUnits) : []; 
+    });
+    const [tenants, setTenants] = useState(() => {
+        const storedTenants = localStorage.getItem('tenants');
+        return storedTenants ? JSON.parse(storedTenants) : [];
     });
     const [currentMaintenanceRequest, setCurrentMaintenanceRequest] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
@@ -167,6 +172,7 @@ const MaintenaceRequests = () => {
                                 onClose={() => setShowAddMaintenanceRequestModal(false)}
                                 properties={properties}
                                 units={units}
+                                tenants={tenants}
                                 // onAdd={(newRequest) => {
                                 //     const updatedRequests = [...maintenanceRequests, newRequest];
                                 //     setMaintenanceRequests(updatedRequests);
