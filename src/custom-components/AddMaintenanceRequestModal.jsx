@@ -1,7 +1,10 @@
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { setHours, setMinutes } from "date-fns";
 import CustomStyles from '@custom-components/CustomStyles';
 import Select from 'react-select';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, properties, units }) => {
 
@@ -125,6 +128,92 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                                         />
                                     </>
                                 )}
+                            </div>
+
+                            {formData.unit && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Tenant Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={formData.unit ? units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).find(u => u.label === formData.unit)?.tenant_name : ''}
+                                        placeholder="Enter tenant name"
+                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 transition-all duration-300 hover:cursor-not-allowed bg-gray-100"
+                                    />
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Issue *
+                                </label>
+                                <Select
+                                    isClearable
+                                    isSearchable
+                                    placeholder="Select an issue"
+                                    value={formData.issueCategory ? { label: formData.issueCategory, value: formData.issueCategory } : null}
+                                    onChange={(selectedOption) => {
+                                        setFormData({ 
+                                            ...formData, 
+                                            issueCategory: selectedOption ? selectedOption.value : ''
+                                        });
+                                    }}
+                                    options={[
+                                        { label: 'Plumbing', value: 'Plumbing' },
+                                        { label: 'Electrical', value: 'Electrical' },
+                                        { label: 'Heating/Cooling', value: 'Heating/Cooling' },
+                                        { label: 'Appliances', value: 'Appliances' },
+                                        { label: 'Structural', value: 'Structural' },
+                                        { label: 'Pest Control', value: 'Pest Control' },
+                                        { label: 'Other', value: 'Other' }
+                                    ]}
+                                    styles={CustomStyles}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Priority *
+                                </label>
+                                <Select
+                                    isClearable
+                                    isSearchable
+                                    placeholder="Select priority level"
+                                    value={formData.priority ? { label: formData.priority, value: formData.priority } : null}
+                                    onChange={(selectedOption) => {
+                                        setFormData({ 
+                                            ...formData, 
+                                            priority: selectedOption ? selectedOption.value : ''
+                                        });
+                                    }}
+                                    options={[
+                                        { label: 'Low', value: 'Low' },
+                                        { label: 'Medium', value: 'Medium' },
+                                        { label: 'High', value: 'High' }
+                                    ]}
+                                    styles={CustomStyles}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Preferred Visit Date & Time *
+                                </label>
+                                <DatePicker
+                                    selected={formData.preferredVisitDateAndTime}
+                                    onChange={(date) => setFormData({ ...formData, preferredVisitDateAndTime: date })}
+                                    showTimeSelect
+                                    minDate={new Date()}
+                                    timeFormat="HH:mm"
+                                    timeIntervals={30}
+                                    dateFormat="MMMM d, yyyy h:mm aa"
+                                    minTime={setHours(setMinutes(new Date(), 0), 9)}
+                                    maxTime={setHours(setMinutes(new Date(), 30), 17)}
+                                    placeholderText="Select preferred visit date and time"
+                                    className="w-full px-3 py-2.5 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                                />
                             </div>
                         </div>
                     </form>

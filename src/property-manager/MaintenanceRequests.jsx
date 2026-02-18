@@ -3,6 +3,7 @@ import { AlertCircle, AlertTriangle, CheckCircle, ClipboardList, Timer, Wrench, 
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
+import AddMaintenanceRequestModal from "../custom-components/AddMaintenanceRequestModal";
 
 const MaintenaceRequests = () => {
 
@@ -20,8 +21,38 @@ const MaintenaceRequests = () => {
         const storedUnits = localStorage.getItem('units');
         return storedUnits ? JSON.parse(storedUnits) : []; 
     });
+    const [currentMaintenanceRequest, setCurrentMaintenanceRequest] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+
+
+    const handleAddEditMaintenanceRequest = (requestData) => {
+        if (currentMaintenanceRequest) {
+            // Edit existing request
+            const updatedRequests = maintenanceRequests.map(req => 
+                req.id === currentMaintenanceRequest.id ? requestData : req
+            );
+            setMaintenanceRequests(updatedRequests);
+            localStorage.setItem("maintenanceRequests", JSON.stringify(updatedRequests));
+        } else {
+            // Add new request
+            const newMaintenanceRequest = { id: crypto.randomUUID(), ...requestData };
+            const updatedRequests = [...maintenanceRequests, newMaintenanceRequest];
+            setMaintenanceRequests(updatedRequests);
+            try {
+                localStorage.setItem('maintenanceRequests', JSON.stringify(updatedRequests));
+            } catch (error) {
+                if (error.name === 'QuotaExceededError') {
+                    console.error('Local storage quota exceeded. Cannot save maintenance request.');
+                    notify('error', 'Failed to save maintenance request: local storage quota exceeded.');
+                    return;
+                }
+            }
+            notify('success', 'Maintenance request added successfully.');
+        }
+        // setCurrentMaintenanceRequest(null);
+        // setShowAddMaintenanceRequestModal(false);
+    };
 
     return (
         <>
@@ -108,12 +139,40 @@ const MaintenaceRequests = () => {
                                                     </div>
 
                                                     {/* Render list of Maintenance Requests */}
+                                                    <div className="overflow-x-auto">
+                                                        <table className="min-w-full divide-y divide-gray-200">
+                                                            <thead className="bg-gray-50">
+                                                                <tr>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
                                                 </>
                                             )}
                                         </>
                                     </div>
                                 </div>
                             </div>
+
+                            {/* AddMaintenanceRequestModal */}
+                            <AddMaintenanceRequestModal 
+                                isOpen={showAddMaintenanceRequestModal}
+                                data={currentMaintenanceRequest}
+                                onSubmit={handleAddEditMaintenanceRequest}
+                                onClose={() => setShowAddMaintenanceRequestModal(false)}
+                                properties={properties}
+                                units={units}
+                                // onAdd={(newRequest) => {
+                                //     const updatedRequests = [...maintenanceRequests, newRequest];
+                                //     setMaintenanceRequests(updatedRequests);
+                                //     localStorage.setItem("maintenanceRequests", JSON.stringify(updatedRequests));
+                                // }}
+                            />
                         </main>
                 </div>
             </div>
