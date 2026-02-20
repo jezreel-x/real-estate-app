@@ -5,6 +5,7 @@ import CustomStyles from '@custom-components/CustomStyles';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import ImageUploader from "./ImageUploader";
 
 const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, properties, units, tenants }) => {
 
@@ -30,6 +31,26 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
             });
         }
     }, [data]);
+
+    useEffect(() => {
+        if (formData.unit) {
+            const selectedUnit = units
+                .filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id)
+                .find(u => u.label === formData.unit);
+            
+            setFormData(prev => ({ 
+                ...prev, 
+                tenantName: selectedUnit?.tenant_name || '',
+                tenantPhoneNumber: tenants.find(t => t.plot_number === formData.unit)?.phone || ''
+             }));
+         } else {
+            setFormData(prev => ({ 
+                ...prev, 
+                tenantName: '',
+                tenantPhoneNumber: ''
+            }));
+         };
+        }, [formData.unit, formData.property, properties, units]);
 
     if (!isOpen) return null;
 
@@ -58,6 +79,10 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleImagesUpdate = (newImages) => {
+        setFormData(prev => ({ ...prev, images: newImages }));
     };
 
     return (
@@ -139,7 +164,7 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                                         <input
                                             type="text"
                                             readOnly
-                                            value={formData.unit ? units.filter(u => u.property_id === properties.find(p => p.property_name === formData.property)?.id).find(u => u.label === formData.unit)?.tenant_name : ''}
+                                            value={formData.tenantName}
                                             placeholder="Enter tenant name"
                                             className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 transition-all duration-300 hover:cursor-not-allowed bg-gray-100"
                                         />
@@ -232,6 +257,47 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                         </div>
 
                         {/* Image upload and description fields can be added here */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Upload images (5 max.) *
+                            </label>
+                            <div className='flex border border-gray-300 rounded-lg py-3 px-2 flex-wrap gap-4'>
+                                <ImageUploader
+                                    images={formData.images}
+                                    setImages={handleImagesUpdate}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Description (Optional)
+                            </label>
+                            <textarea
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                                rows={4}
+                                placeholder='Description of the maintenance issue, any specific instructions for the maintenance team, or additional context for the request.'
+                            />
+                        </div>
+
+                        <div className='flex space-x-3 pt-4'>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="flex-1 cursor-pointer px-4 py-2 border border-gray-300 text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="flex-1 cursor-pointer px-4 py-2 bg-[rgb(0,0,30)] text-amber-500 rounded-lg hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? 'Submitting...' : data ? 'Update Maintenance Request' : 'Add Maintenance Request'}
+                            </button>
+                        </div>
                     </form>
 
                 </div>

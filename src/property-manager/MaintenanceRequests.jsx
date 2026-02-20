@@ -30,8 +30,19 @@ const MaintenaceRequests = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
+    const generateRequestID = (length = 6) => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let result = '';
 
-    const handleAddEditMaintenanceRequest = (requestData) => {
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        };
+
+        return result.toUpperCase();
+    };
+
+
+    const handleAddEditMaintenanceRequest = (requestData, generateRequestID) => {
         if (currentMaintenanceRequest) {
             // Edit existing request
             const updatedRequests = maintenanceRequests.map(req => 
@@ -41,7 +52,7 @@ const MaintenaceRequests = () => {
             localStorage.setItem("maintenanceRequests", JSON.stringify(updatedRequests));
         } else {
             // Add new request
-            const newMaintenanceRequest = { id: crypto.randomUUID(), ...requestData };
+            const newMaintenanceRequest = { id: crypto.randomUUID(), requestID: generateRequestID(), ...requestData };
             const updatedRequests = [...maintenanceRequests, newMaintenanceRequest];
             setMaintenanceRequests(updatedRequests);
             try {
@@ -58,6 +69,19 @@ const MaintenaceRequests = () => {
         // setCurrentMaintenanceRequest(null);
         // setShowAddMaintenanceRequestModal(false);
     };
+
+    {/* 
+    * @TODO: Implement edit functionality - when clicking on a maintenance request, populate the AddMaintenanceRequestModal with the request's data and allow editing. 
+      This will involve setting currentMaintenanceRequest to the selected request and modifying handleAddEditMaintenanceRequest to handle both adding and editing logic based on whether 
+      currentMaintenanceRequest is null or not.
+
+      @TODO: Implement delete functionality - add a delete button for each maintenance request in the table, and implement a function to remove the request from state 
+      and localStorage when clicked.
+
+      @TODO: Implement pagination for the maintenance requests table, especially when there are many requests. This will involve adding state for currentPage and itemsPerPage, and
+      modifying the rendering logic to only show the requests for the current page, as well as adding pagination controls to navigate between pages.
+    *
+    * */}
 
     return (
         <>
@@ -148,11 +172,12 @@ const MaintenaceRequests = () => {
                                                         <table className="min-w-full divide-y divide-gray-200">
                                                             <thead className="bg-gray-50">
                                                                 <tr>
-                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request ID</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Property</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Category</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                                                                 </tr>
                                                             </thead>
                                                         </table>
