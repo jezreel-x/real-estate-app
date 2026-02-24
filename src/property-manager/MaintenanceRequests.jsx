@@ -70,6 +70,18 @@ const MaintenaceRequests = () => {
         // setShowAddMaintenanceRequestModal(false);
     };
 
+    // Filter maintenance requests based on search query
+    const filteredMaintenanceRequests = maintenanceRequests.filter(request => {
+        const query = searchQuery.trim().toLowerCase();
+
+        return (
+            request.title.toLowerCase().includes(query) ||
+            request.priority.toLowerCase().includes(query) ||
+            request.description.toLowerCase().includes(query) ||
+            request.status.toLowerCase().includes(query)
+        );
+    });
+
     {/* 
     * @TODO: Implement edit functionality - when clicking on a maintenance request, populate the AddMaintenanceRequestModal with the request's data and allow editing. 
       This will involve setting currentMaintenanceRequest to the selected request and modifying handleAddEditMaintenanceRequest to handle both adding and editing logic based on whether 

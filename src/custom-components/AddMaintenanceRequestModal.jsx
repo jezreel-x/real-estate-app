@@ -15,6 +15,8 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
         unit: '',
         issueCategory: '',
         priority: 'Medium',
+        status: 'New', // default status for new requests
+        assignedMaintainer: '', // assigned maintainer from service providers
         description: '',
         preferredVisitDateAndTime: null,
         tenantName: '',
@@ -23,6 +25,10 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [serviceProviders, setServiceProviders] = useState(() => {
+        const storedProviders = localStorage.getItem("serviceProviders");
+        return storedProviders ? JSON.parse(storedProviders) : [];
+    });
 
     useEffect(() => {
         if (data) {
@@ -66,6 +72,8 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                 unit: '',
                 issueCategory: '',
                 priority: 'Medium',
+                status: 'New', // default status for new requests
+                assignedMaintainer: '', // assigned maintainer from service providers
                 description: '',
                 preferredVisitDateAndTime: null,
                 tenantName: '',
@@ -235,6 +243,61 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                                     styles={CustomStyles}
                                 />
                             </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Status *
+                                </label>
+                                <Select
+                                    isClearable
+                                    isSearchable
+                                    placeholder="Select status"
+                                    value={formData.status ? { label: formData.status, value: formData.status } : null}
+                                    onChange={(selectedOption) => {
+                                        setFormData({ 
+                                            ...formData, 
+                                            status: selectedOption ? selectedOption.value : '',
+                                            assignedMaintainer: selectedOption?.value !== 'Assigned' ? '' : formData.assignedMaintainer
+                                        });
+                                    }}
+                                    options={[
+                                        { label: 'New', value: 'New' },
+                                        { label: 'Assigned', value: 'Assigned' },
+                                        { label: 'In Progress', value: 'In Progress' },
+                                        { label: 'Completed', value: 'Completed' },
+                                        { label: 'Closed', value: 'Closed' }
+                                    ]}
+                                    styles={CustomStyles}
+                                />
+                            </div>
+
+                            {formData.status === 'Assigned' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Assigned Maintainer *
+                                    </label>
+                                    <Select
+                                        isClearable
+                                        isSearchable
+                                        placeholder="Select a service provider"
+                                        value={formData.assignedMaintainer ? { 
+                                            label: `${formData.assignedMaintainer.name} (${formData.assignedMaintainer.specialization})`, 
+                                            value: formData.assignedMaintainer 
+                                        } : null}
+                                        onChange={(selectedOption) => {
+                                            setFormData({ 
+                                                ...formData, 
+                                                assignedMaintainer: selectedOption ? selectedOption.value : ''
+                                            });
+                                        }}
+                                        options={serviceProviders.map((provider) => ({
+                                            label: `${provider.name} (${provider.specialization})`,
+                                            value: provider
+                                        }))}
+                                        styles={CustomStyles}
+                                    />
+                                </div>
+                            )}
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
