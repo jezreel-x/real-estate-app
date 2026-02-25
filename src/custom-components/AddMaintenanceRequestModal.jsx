@@ -17,6 +17,8 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
         priority: 'Medium',
         status: 'New', // default status for new requests
         assignedMaintainer: '', // assigned maintainer from service providers
+        dateReported: new Date().toISOString(), // set to current date and time
+        dateResoved: null, // initially null until resolved
         description: '',
         preferredVisitDateAndTime: null,
         tenantName: '',
@@ -272,31 +274,42 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                             </div>
 
                             {formData.status === 'Assigned' && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Assigned Maintainer *
-                                    </label>
-                                    <Select
-                                        isClearable
-                                        isSearchable
-                                        placeholder="Select a service provider"
-                                        value={formData.assignedMaintainer ? { 
-                                            label: `${formData.assignedMaintainer.name} (${formData.assignedMaintainer.specialization})`, 
-                                            value: formData.assignedMaintainer 
-                                        } : null}
-                                        onChange={(selectedOption) => {
-                                            setFormData({ 
-                                                ...formData, 
-                                                assignedMaintainer: selectedOption ? selectedOption.value : ''
-                                            });
-                                        }}
-                                        options={serviceProviders.map((provider) => ({
-                                            label: `${provider.name} (${provider.specialization})`,
-                                            value: provider
-                                        }))}
-                                        styles={CustomStyles}
-                                    />
-                                </div>
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Assigned Maintainer *
+                                        </label>
+                                        <Select
+                                            isClearable
+                                            isSearchable
+                                            placeholder="Select a service provider"
+                                            value={formData.assignedMaintainer ? { label: formData.assignedMaintainer.name, value: formData.assignedMaintainer } : null}
+                                            onChange={(selectedOption) => {
+                                                setFormData({ 
+                                                    ...formData, 
+                                                    assignedMaintainer: selectedOption ? selectedOption.value : ''
+                                                });
+                                            }}
+                                            options={serviceProviders.map((provider) => ({
+                                                label: `${provider.name} - ${provider.specialization}`,
+                                                value: `${provider.name} - ${provider.specialization}`
+                                            }))}
+                                            styles={CustomStyles}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Date Reported *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            required
+                                            value={formData.dateReported ? formData.dateReported.split('T')[0] : ''}
+                                            onChange={(e) => setFormData({ ...formData, dateReported: e.target.value })}
+                                            className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </>
                             )}
 
                             <div>
