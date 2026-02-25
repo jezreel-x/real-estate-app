@@ -58,7 +58,7 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                 tenantPhoneNumber: ''
             }));
          };
-        }, [formData.unit, formData.property, properties, units]);
+        }, [formData.unit, formData.property, properties, units, tenants]);
 
     if (!isOpen) return null;
 
@@ -98,7 +98,7 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
     return (
         <>
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"> {/* Modal Overlay */}
-                <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"> {/* Modal Container */}
+                <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"> {/* Modal Container */}
                     
                     {/* Modal Header */}
                     <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">

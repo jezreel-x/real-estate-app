@@ -275,11 +275,11 @@ const ApartmentForRentDetails = () => {
                                     onChange={(date) => setSelectedDate(date)}
                                     showTimeSelect
                                     minDate={new Date()}
-                                    timeFormat="HH:mm"
-                                    timeIntervals={30}
-                                    dateFormat="MMMM d, yyyy h:mm aa"
-                                    minTime={setHours(setMinutes(new Date(), 0), 9)}
-                                    maxTime={setHours(setMinutes(new Date(), 30), 17)}
+                                    timeFormat="HH:mm" // 24-hr time format display
+                                    timeIntervals={30} // defines the selectable time intervals (e.g., 30 minutes)
+                                    dateFormat="MMMM d, yyyy h:mm aa" // how the selected date and time are displayed in the input
+                                    minTime={setHours(setMinutes(new Date(), 0), 9)} // earliest time available for selection (e.g., 9:00 AM)
+                                    maxTime={setHours(setMinutes(new Date(), 30), 17)} // latest time available for selection (e.g., 5:30 PM)
                                     placeholderText="Select Date and Time"
                                     className="w-full text-gray-700 text-center focus:outline-none focus:ring-2 focus:ring-blue-400 border border-gray-300 px-3 py-4 rounded-lg"
                                 />
