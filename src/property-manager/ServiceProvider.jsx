@@ -131,7 +131,7 @@ const ServiceProvider = () => {
         }
     }; 
 
-    // function to confirm deletion of an expense
+    // function to confirm deletion of a service provider and show loading notification while deleting
     const handleDeleteServiceProviderConfirmed = (serviceProviderID) => {
 
         // loading notification for deletion process

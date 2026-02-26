@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
-import { setHours, setMinutes } from "date-fns";
+import { setHours, setMinutes, format } from "date-fns";
 import CustomStyles from '@custom-components/CustomStyles';
 import Select from 'react-select';
 import DatePicker from "react-datepicker";
@@ -17,8 +17,8 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
         priority: 'Medium',
         status: 'New', // default status for new requests
         assignedMaintainer: '', // assigned maintainer from service providers
-        dateReported: new Date().toISOString(), // set to current date and time
-        dateResoved: null, // initially null until resolved
+        dateReported: format(new Date(), 'dd/MM/yyyy'), // set to current date and time
+        dateResolved: null, // initially null until resolved
         description: '',
         preferredVisitDateAndTime: null,
         tenantName: '',
@@ -76,6 +76,8 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                 priority: 'Medium',
                 status: 'New', // default status for new requests
                 assignedMaintainer: '', // assigned maintainer from service providers
+                dateReported: format(new Date(), 'dd/MM/yyyy'), // set to current date and time
+                dateResolved: null, // initially null until resolved
                 description: '',
                 preferredVisitDateAndTime: null,
                 tenantName: '',
@@ -98,7 +100,7 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
     return (
         <>
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"> {/* Modal Overlay */}
-                <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"> {/* Modal Container */}
+                <div className="bg-white rounded-lg shadow-xl xl:max-w-2xl 3xl:max-w-3xl w-full max-h-[90vh] overflow-y-auto"> {/* Modal Container */}
                     
                     {/* Modal Header */}
                     <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -273,7 +275,7 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                                 />
                             </div>
 
-                            {formData.status === 'Assigned' && (
+                            {formData.status !== 'New' && (
                                 <>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -282,12 +284,15 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                                         <Select
                                             isClearable
                                             isSearchable
+                                            isDisabled={!!data}
                                             placeholder="Select a service provider"
-                                            value={formData.assignedMaintainer ? { label: formData.assignedMaintainer.name, value: formData.assignedMaintainer } : null}
+                                            value={formData.assignedMaintainer ? { label: formData.assignedMaintainer, value: formData.assignedMaintainer } : null}
                                             onChange={(selectedOption) => {
                                                 setFormData({ 
                                                     ...formData, 
-                                                    assignedMaintainer: selectedOption ? selectedOption.value : ''
+                                                    // assignedMaintainer: selectedOption ? selectedOption.value : ''
+                                                    status: selectedOption ? selectedOption.value : '',
+                                                    assignedMaintainer: (!data && selectedOption?.value !== 'Assigned') ? '' : formData.assignedMaintainer
                                                 });
                                             }}
                                             options={serviceProviders.map((provider) => ({
@@ -304,32 +309,50 @@ const AddMaintenanceRequestModal = ({ isOpen, data, onSubmit, onClose, propertie
                                         <input
                                             type="date"
                                             required
+                                            disabled={!!data}
                                             value={formData.dateReported ? formData.dateReported.split('T')[0] : ''}
                                             onChange={(e) => setFormData({ ...formData, dateReported: e.target.value })}
-                                            className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         />
                                     </div>
                                 </>
                             )}
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Preferred Visit Date & Time *
-                                </label>
-                                <DatePicker
-                                    selected={formData.preferredVisitDateAndTime}
-                                    onChange={(date) => setFormData({ ...formData, preferredVisitDateAndTime: date })}
-                                    showTimeSelect
-                                    minDate={new Date()}
-                                    timeFormat="HH:mm"
-                                    timeIntervals={30}
-                                    dateFormat="MMMM d, yyyy h:mm aa"
-                                    minTime={setHours(setMinutes(new Date(), 0), 9)}
-                                    maxTime={setHours(setMinutes(new Date(), 30), 17)}
-                                    placeholderText="Select preferred visit date and time"
-                                    className="w-full px-3 py-2.5 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                                />
-                            </div>
+                            {formData.status === 'Closed' && formData.assignedMaintainer !== "" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Date Resolved *
+                                    </label>
+                                    <input
+                                        type="date"
+                                        required
+                                        value={formData.dateResolved ? formData.dateResolved.split('T')[0] : ''}
+                                        onChange={(e) => setFormData({ ...formData, dateResolved: e.target.value })}
+                                        className="w-full text-gray-900 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                </div>
+                            )}
+
+                            {formData.status === 'New' && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Preferred Visit Date & Time *
+                                    </label>
+                                    <DatePicker
+                                        selected={formData.preferredVisitDateAndTime}
+                                        onChange={(date) => setFormData({ ...formData, preferredVisitDateAndTime: date })}
+                                        showTimeSelect
+                                        minDate={new Date()}
+                                        timeFormat="HH:mm"
+                                        timeIntervals={30}
+                                        dateFormat="MMMM d, yyyy h:mm aa"
+                                        minTime={setHours(setMinutes(new Date(), 0), 9)}
+                                        maxTime={setHours(setMinutes(new Date(), 30), 17)}
+                                        placeholderText="Select preferred visit date and time"
+                                        className="w-full px-3 py-2.5 text-center border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         {/* Image upload and description fields can be added here */}

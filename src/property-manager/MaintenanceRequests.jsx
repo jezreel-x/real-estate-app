@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { AlertCircle, AlertTriangle, CheckCircle, ClipboardList, Timer, Wrench, Plus, FileText, Search } from "lucide-react";
+import { useState, useMemo } from "react";
+import { AlertCircle, AlertTriangle, CheckCircle, ClipboardList, Timer, Wrench, Plus, FileText, Search, Pencil, Trash2 } from "lucide-react";
 import PropertyManagerNavbar from "./PropertyManagerNavbar";
 import Sidebar from "./Sidebar";
 import { StatCard } from "@custom-components/StatCard";
 import { notify } from "@custom-components/toastHelper";
-import AddMaintenanceRequestModal from "../custom-components/AddMaintenanceRequestModal";
+import AddMaintenanceRequestModal from "@custom-components/AddMaintenanceRequestModal";
+import Pagination from "@custom-components/Pagination";
+
 
 const MaintenaceRequests = () => {
 
@@ -29,17 +31,7 @@ const MaintenaceRequests = () => {
     const [currentMaintenanceRequest, setCurrentMaintenanceRequest] = useState(null);
     const [searchQuery, setSearchQuery] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-
-    const generateRequestID = (length = 6) => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-
-        for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
-        };
-
-        return result.toUpperCase();
-    };
+    const [itemsPerPage, setItemsPerPage] = useState(5);
 
 
     const handleAddEditMaintenanceRequest = (requestData, generateRequestID) => {
@@ -51,6 +43,19 @@ const MaintenaceRequests = () => {
             setMaintenanceRequests(updatedRequests);
             localStorage.setItem("maintenanceRequests", JSON.stringify(updatedRequests));
         } else {
+
+            // generate unique request ID using crypto API for better uniqueness and security
+            var generateRequestID = (length = 6) => {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+
+                for (let i = 0; i < length; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                };
+
+                return result.toUpperCase();
+            };
+
             // Add new request
             const newMaintenanceRequest = { id: crypto.randomUUID(), requestID: generateRequestID(), ...requestData };
             const updatedRequests = [...maintenanceRequests, newMaintenanceRequest];
@@ -75,12 +80,54 @@ const MaintenaceRequests = () => {
         const query = searchQuery.trim().toLowerCase();
 
         return (
-            request.title.toLowerCase().includes(query) ||
+            request.assignedMaintainer.toLowerCase().includes(query) ||
+            request.property.toLowerCase().includes(query) ||
+            request.unit.toLowerCase().includes(query) ||
+            request.issueCategory.toLowerCase().includes(query) ||
             request.priority.toLowerCase().includes(query) ||
             request.description.toLowerCase().includes(query) ||
             request.status.toLowerCase().includes(query)
         );
     });
+
+
+    // Pagination logic
+    // total pages based on filtered service providers
+    const totalPages = Math.ceil(filteredMaintenanceRequests.length / itemsPerPage);
+
+    // get current page service providers
+    const paginatedMaintenanceRequests = useMemo(() => {
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        return filteredMaintenanceRequests.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredMaintenanceRequests, currentPage, itemsPerPage]);
+
+    // function to handle page change
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
+    // function to handle prompting of whether to delete or not
+    const handleDeleteMaintenanceRequest = (maintenanceRequestID) => {
+        if (window.confirm('Are you sure you want to delete this maintenance request? This action cannot be undone.')) {
+            handleDeleteMaintenanceRequestConfirmed(maintenanceRequestID);
+        }
+    }; 
+
+    // function to confirm deletion of a maintenance request and show loading notification while deleting
+    const handleDeleteMaintenanceRequestConfirmed = (maintenanceRequestID) => {
+
+        // loading notification for deletion process
+        notify('info', 'Deleting Maintenance Request...');
+
+        setTimeout(() => {
+            const updatedMaintenanceRequests = maintenanceRequests.filter((request) => request.id !== maintenanceRequestID);
+            setMaintenanceRequests(updatedMaintenanceRequests);
+            localStorage.setItem('maintenanceRequests', JSON.stringify(updatedMaintenanceRequests));
+            notify('success', 'Maintenance Request deleted successfully!!!');
+        }, 3000);
+    };
 
     {/* 
     * @TODO: Implement edit functionality - when clicking on a maintenance request, populate the AddMaintenanceRequestModal with the request's data and allow editing. 
@@ -190,10 +237,73 @@ const MaintenaceRequests = () => {
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issue Category</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
                                                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Created</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Resolved</th>
+                                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                                                                 </tr>
                                                             </thead>
+                                                            <tbody className="bg-white divide-y divide-gray-200">
+                                                                {paginatedMaintenanceRequests.map((request, index) => (
+                                                                    <tr 
+                                                                        key={index}
+                                                                        className="hover:bg-gray-50 cursor-pointer transition-all duration-300 animate-[fadeInUp_0.3s_ease-in-out]"
+                                                                    >
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.requestID}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.property}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.unit}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.issueCategory}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.priority}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.status}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.assignedMaintainer !== "" ? request.assignedMaintainer : "Unassigned"}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.dateReported}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{request.dateResolved !== null ? request.dateResolved : "Not Resolved"}</td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                            <button 
+                                                                                className="text-blue-600 hover:text-blue-900 mr-4 cursor-pointer"
+                                                                                onClick={() => {
+                                                                                    // e.stopPropagation();
+                                                                                    setShowAddMaintenanceRequestModal(true);
+                                                                                    setCurrentMaintenanceRequest(request);
+                                                                                }}
+                                                                            >
+                                                                                {/* include an edit icon instead of text */}
+                                                                                <Pencil className="w-5 h-5" />
+                                                                            </button>
+                                                                            <button 
+                                                                                className="text-red-600 hover:text-red-900 cursor-pointer"
+                                                                                onClick={() => {
+                                                                                    handleDeleteMaintenanceRequest(request.id)
+                                                                                }}
+                                                                            >
+                                                                                {/* include a delete/trash icon instead of text */}
+                                                                                <Trash2 className="w-5 h-5" />
+                                                                            </button>
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
                                                         </table>
                                                     </div>
+
+                                                    {/* If no maintenance requests match the search query */}
+                                                    {filteredMaintenanceRequests.length === 0 && (
+                                                        <div className="text-center py-12">
+                                                            <FileText className="mx-auto h-12 w-12 text-gray-400" />
+                                                            <h3 className="mt-2 text-sm font-medium text-gray-900">No maintenance requests found</h3>
+                                                            <p className="mt-1 text-sm text-gray-500">Try adjusting your search or add a new maintenance request.</p>
+                                                        </div>
+                                                    )}
+    
+                                                    {/* Pagination Controls */}
+                                                    <Pagination
+                                                        currentPage={currentPage}
+                                                        setCurrentPage={setCurrentPage}
+                                                        itemsPerPage={itemsPerPage}
+                                                        setItemsPerPage={setItemsPerPage}
+                                                        totalPages={totalPages}
+                                                        handlePageChange={handlePageChange}
+                                                    />
                                                 </>
                                             )}
                                         </>
